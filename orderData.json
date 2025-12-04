@@ -1,0 +1,63 @@
+{
+  "_id": {
+    "$oid": "672ef546611b3945d1ca23f5"
+  },
+  "items": [
+    {
+      "id": "672ef2db8055d10e4f7b41d9",
+      "sku": "672ef2db8055d10e4f7b41d9",
+      "name": "Fearless Sportsmen Vibes Yuvraj Singh  the  Legend Black Women Classic Fit tshirts",
+      "units": 1,
+      "selling_price": 500,
+      "thumbnail": "https://firebasestorage.googleapis.com/v0/b/shamaim-lifestyle.appspot.com/o/Women_crewneak%2F19-SL32CNBL%20(1).jpg?alt=media&token=bb7bbf57-3c5d-4382-8926-7721908fe562",
+      "selectedAddress": {
+        "name": "Shubham Pandey",
+        "email": "sp2002p@gmail.com",
+        "phone": "07761065726",
+        "street": "vill-pipariya post-chewwari p.s-ramgarh",
+        "city": "Patna",
+        "state": "Bihar",
+        "pinCode": "821110"
+      },
+      "quantity": 1,
+      "size": {
+        "name": "M",
+        "inStock": true
+      },
+      "productid": "66e57b7b4c7db30c1e163d6e"
+    }
+  ],
+  "totalAmount": 500,
+  "totalItems": 1,
+  "user": {
+    "$oid": "6696bddfa065d5ddf384413b"
+  },
+  "paymentDetails": [
+    {
+      "payMode": "COD"
+    }
+  ],
+  "shiprocketResponse": [
+    {
+      "order_id": 682819535,
+      "channel_order_id": "F0qYuz4wSG0jas-KNPJyA",
+      "shipment_id": 679403592,
+      "status": "NEW",
+      "status_code": 1,
+      "onboarding_completed_now": 0,
+      "awb_code": "",
+      "courier_company_id": "",
+      "courier_name": "",
+      "new_channel": false,
+      "packaging_box_error": ""
+    }
+  ],
+  "status": "pending",
+  "createdAt": {
+    "$date": "2024-11-09T05:38:14.360Z"
+  },
+  "updatedAt": {
+    "$date": "2024-11-09T05:38:14.360Z"
+  },
+  "__v": 0
+}
