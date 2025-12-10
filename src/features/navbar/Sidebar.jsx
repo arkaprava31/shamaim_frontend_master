@@ -66,8 +66,8 @@ const Sidebar = ({ toggle, handleClick }) => {
             {
               name: 'Dropshoulder', link: '/men/hoodies/oversized',
               subcategories: [
-                { name: 'Solid', link: '/men/hoodies/crewneck/solid' },
-                { name: 'Printed', link: '/men/hoodies/crewneck/printed' },
+                { name: 'Solid', link: '/men/hoodies/oversized/solid' },
+                { name: 'Printed', link: '/men/hoodies/oversized/printed' },
               ],
             },
           ],
@@ -79,22 +79,22 @@ const Sidebar = ({ toggle, handleClick }) => {
             {
               name: 'Classic Fit', link: '/men/crewneck',
               subcategories: [
-                { name: 'Solid', link: '/men/hoodies/crewneck/solid' },
-                { name: 'Printed', link: '/men/hoodies/crewneck/printed' },
+                { name: 'Solid', link: '/men/crewneck/solid' },
+                { name: 'Printed', link: '/men/crewneck/printed' },
               ],
             },
             {
               name: 'Oversized', link: '/men/oversized',
               subcategories: [
-                { name: 'Solid', link: '/men/hoodies/crewneck/solid' },
-                { name: 'Printed', link: '/men/hoodies/crewneck/printed' },
+                { name: 'Solid', link: '/men/oversized/solid' },
+                { name: 'Printed', link: '/men/oversized/printed' },
               ],
             },
             {
               name: 'Polo', link: '/men/polo',
               subcategories: [
-                { name: 'Solid', link: '/men/hoodies/crewneck/solid' },
-                { name: 'Printed', link: '/men/hoodies/crewneck/printed' },
+                { name: 'Solid', link: '/men/polo/solid' },
+                { name: 'Printed', link: '/men/polo/printed' },
               ],
             },
           ],
@@ -112,15 +112,15 @@ const Sidebar = ({ toggle, handleClick }) => {
             {
               name: 'Classic Fit', link: '/women/hoodies/crewneck',
               subcategories: [
-                { name: 'Solid', link: '/men/hoodies/crewneck/solid' },
-                { name: 'Printed', link: '/men/hoodies/crewneck/printed' },
+                { name: 'Solid', link: '/women/hoodies/crewneck/solid' },
+                { name: 'Printed', link: '/women/hoodies/crewneck/printed' },
               ],
             },
             {
               name: 'Dropshoulder', link: '/women/hoodies/oversized',
               subcategories: [
-                { name: 'Solid', link: '/men/hoodies/crewneck/solid' },
-                { name: 'Printed', link: '/men/hoodies/crewneck/printed' },
+                { name: 'Solid', link: '/women/hoodies/oversized/solid' },
+                { name: 'Printed', link: '/women/hoodies/oversized/printed' },
               ],
             },
           ],
@@ -132,15 +132,15 @@ const Sidebar = ({ toggle, handleClick }) => {
             {
               name: 'Classic Fit', link: '/women/crewneck',
               subcategories: [
-                { name: 'Solid', link: '/men/hoodies/crewneck/solid' },
-                { name: 'Printed', link: '/men/hoodies/crewneck/printed' },
+                { name: 'Solid', link: '/women/crewneck/solid' },
+                { name: 'Printed', link: '/women/crewneck/printed' },
               ],
             },
             {
               name: 'Oversized', link: "/women/oversized",
               subcategories: [
-                { name: 'Solid', link: '/men/hoodies/crewneck/solid' },
-                { name: 'Printed', link: '/men/hoodies/crewneck/printed' },
+                { name: 'Solid', link: '/women/oversized/solid' },
+                { name: 'Printed', link: '/women/oversized/printed' },
               ],
             },
           ],
