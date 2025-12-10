@@ -2,7 +2,6 @@ import { useState, useEffect, useCallback,useRef } from 'react';
 import { fetchCategoryProductAsync } from '../productSlice';
 import { useDispatch, useSelector } from 'react-redux';
 import { Link } from 'react-router-dom';
-import NavigationBar from './NavigationBar';
 export default function WomenHoddiesCreackneak() {
    const [data, setData] = useState([]);
     const [totalpage, setTotalpages] = useState();
@@ -65,7 +64,6 @@ export default function WomenHoddiesCreackneak() {
     return (
       <>
         <div className="h-[100%]">
-          <NavigationBar />
           <img
             src="https://firebasestorage.googleapis.com/v0/b/shamaim-lifestyle.appspot.com/o/Category%20wallpepar%2FCLASSIC%20WOMEN.jpg?alt=media&token=1cc64524-9377-4810-89af-fad7a491c7a6"
           />
