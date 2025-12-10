@@ -157,7 +157,7 @@ const Sidebar = ({ toggle, handleClick }) => {
   return (
     <>
       <div
-        className={`fixed top-0 left-0 w-[30vw] bg-white h-[100vh] pb-6 overflow-y-auto z-10 transition-transform duration-300 ease-in-out ${toggle ? 'translate-x-0' : '-translate-x-full'
+        className={`fixed top-0 left-0 w-[80vw] md:w-[50vw] lg:w-[30vw] bg-white h-[100vh] pb-6 overflow-y-auto z-10 transition-transform duration-300 ease-in-out ${toggle ? 'translate-x-0' : '-translate-x-full'
           }`}
       >
         <div className="flex items-center justify-between p-4 text-white bg-blue-700 border-b border-gray-200">

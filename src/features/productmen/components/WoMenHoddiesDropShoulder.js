@@ -2,7 +2,6 @@ import { useState, useEffect, useCallback,useRef } from 'react';
 import { fetchCategoryProductAsync } from '../productSlice';
 import { useDispatch, useSelector } from 'react-redux';
 import { Link } from 'react-router-dom';
-import NavigationBar from './NavigationBar';
 export default function WomenHoddiesDropShoulder() {
    const [data, setData] = useState([]);
     const [totalpage, setTotalpages] = useState();
@@ -65,7 +64,6 @@ export default function WomenHoddiesDropShoulder() {
     return (
       <>
         <div className="h-[100%]">
-          <NavigationBar />
           <img
             src="https://firebasestorage.googleapis.com/v0/b/shamaim-lifestyle.appspot.com/o/Category%20wallpepar%2Fmen%20oversize.jpg?alt=media&token=c2f72afc-b763-4a52-9cda-332c8821416b"
           />

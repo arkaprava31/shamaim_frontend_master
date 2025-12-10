@@ -2,7 +2,6 @@ import { useState, useEffect, useCallback, useRef } from 'react';
 import { fetchCategoryProductAsync } from '../productSlice';
 import { useDispatch, useSelector } from 'react-redux';
 import { Link } from 'react-router-dom';
-import NavigationBar from './NavigationBar';
 
 export default function MenHoddiesCreackneak() {
   const [data, setData] = useState([]);
@@ -66,7 +65,6 @@ export default function MenHoddiesCreackneak() {
   return (
     <>
       <div className="h-[100%]">
-        <NavigationBar />
         <img
           src="https://firebasestorage.googleapis.com/v0/b/shamaim-lifestyle.appspot.com/o/Category%20wallpepar%2Fmen%20crewneck.jpg?alt=media&token=1b96b61c-601d-4da0-9ead-afc351c26952"
         />
