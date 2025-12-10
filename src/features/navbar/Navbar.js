@@ -76,7 +76,7 @@ function NavBar({ children }) {
             <div>
               {showButton ? (
                 <div
-                  className="flex items-center justify-evenly w-[10vw] md:hidden"
+                  className="flex items-center justify-evenly w-[5vw] cursor-pointer"
                   onClick={handleClick}
                 >
                   <img
@@ -100,7 +100,7 @@ function NavBar({ children }) {
                 <img src={shamaim} alt="brand logo" />
               </Link>
             </div>
-            <div className="w-[50%] hidden lg:block">
+            {/* <div className="w-[50%] hidden lg:block">
               <div className="w-full flex justify-between items-center">
                 <Link
                   to="/men"
@@ -135,7 +135,7 @@ function NavBar({ children }) {
                   </ul>
                 </div>
               )}
-            </div>
+            </div> */}
           </div>
           <div className="flex justify-evenly items-center h-[4vh] w-[30vw]">
             <Link
