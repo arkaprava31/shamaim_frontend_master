@@ -4,7 +4,7 @@ import { useSelector } from "react-redux";
 import { selectItems } from "../cart/cartSlice";
 import shamaim from "../../pages/LandingPage/Assets/SHAMAIM.png";
 import { FaOpencart } from "react-icons/fa6";
-import {fetchItemsByUserIdAsync,addToCartAsync} from "../cart/cartSlice";
+import { fetchItemsByUserIdAsync, addToCartAsync } from "../cart/cartSlice";
 import { fetchLoggedInUserAsync } from "../user/userSlice";
 import { useDispatch } from "react-redux";
 import { useContext, useEffect, useState } from "react";
@@ -46,8 +46,8 @@ function NavBar({ children }) {
     async function getcartitem() {
       if (user && showButton == true) {
         await dispatch(fetchItemsByUserIdAsync());
-       await dispatch(addToCartAsync());
-      await  dispatch(fetchLoggedInUserAsync());
+        await dispatch(addToCartAsync());
+        await dispatch(fetchLoggedInUserAsync());
       }
     }
     getcartitem();
@@ -139,7 +139,8 @@ function NavBar({ children }) {
           </div>
           <div className="flex justify-evenly items-center h-[4vh] w-[30vw]">
             <Link
-              to={isLoggedInOrGuest ? "/cart" : "/login"}
+              // to={isLoggedInOrGuest ? "/cart" : "/login"}
+              to={"/cart"}
               className="flex items-center mt-2"
             >
               <FaOpencart size={20} className="relative" />
@@ -147,7 +148,7 @@ function NavBar({ children }) {
                 {totalItems}
               </span>
             </Link>
-            <Link to={"/Account"} className="flex items-center cursor-pointer">
+            <Link to={"/account"} className="flex items-center cursor-pointer">
               <VscAccount size={24} />
             </Link>
           </div>

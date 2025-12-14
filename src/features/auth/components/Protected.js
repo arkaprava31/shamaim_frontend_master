@@ -8,7 +8,7 @@ function Protected({ children }) {
 
   const guestUser = localStorage.getItem("guestUserId");
 
-  if (!user && !guestUser) {
+  if (!user) {
     return <Navigate to="/login" replace={true} />;
   }
 

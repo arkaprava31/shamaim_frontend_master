@@ -85,9 +85,16 @@ export default function ProductDetail() {
     const discountpercentage = product.discountPercentage;
     const actualvalue = productprice * (discountpercentage / 100);
 
-    const matcheditemSized = items.find((item) => {
-      return item.product.id == product.id && item.size.name == selectedSize.name;
-    })
+    console.log("items =", items);
+
+    const matcheditemSized = Array.isArray(items)
+      ? items.find(
+        (item) =>
+          item.product?.id === product?.id &&
+          item.size?.name === selectedSize?.name
+      )
+      : null;
+
     if (getId()) {
       if (matcheditemSized == undefined || Object.keys(matcheditemSized).length < 0) {
         if (selectedSize) {
@@ -124,6 +131,8 @@ export default function ProductDetail() {
           size: selectedSize
         };
 
+        console.log("New item=", newItem);
+        
         if (selectedSize) {
           if (getGuestUserId()) {
             const res = await axios.put(`${baseUrl}/api/addToCart/${getGuestUserId()}`, newItem);
@@ -169,18 +178,20 @@ export default function ProductDetail() {
   };
 
   return (
-    <div className="bg-white ">
+    <div className="bg-white">
       {status === "loading" ? (
-        <Grid
-          height="200"
-          width="150"
-          color="rgb(79, 70, 229) "
-          ariaLabel="grid-loading"
-          radius="12.5"
-          wrapperStyle={{}}
-          wrapperClass=""
-          visible={true}
-        />
+        <div className="w-full flex items-center justify-center py-4">
+          <Grid
+            height="200"
+            width="150"
+            color="rgb(79, 70, 229) "
+            ariaLabel="grid-loading"
+            radius="12.5"
+            wrapperStyle={{}}
+            wrapperClass=""
+            visible={true}
+          />
+        </div>
       ) : null}
       {product && (
         <>
