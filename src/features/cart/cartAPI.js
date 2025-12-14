@@ -15,9 +15,6 @@ export function addToCart(item) {
 }
 
 
-
-
-
 export function fetchItemsByUserId() {
   return new Promise(async (resolve) => {
     const response = await fetch(baseUrl+`/cart/${getId()}`);

@@ -60,10 +60,9 @@ export default function Cart() {
   if (getGuestUserId()) {
     totalItems = cart.length;
   } else {
-    if(items.length>0){
+    if (items.length > 0) {
       totalItems = items.reduce((total, item) => item.quantity + total, 0);
     }
-   
   }
 
   const handleQuantity = (e, item) => {
@@ -105,12 +104,16 @@ export default function Cart() {
     if (getGuestUserId()) {
       setLoader(true);
       try {
-        const res = await axios.get(`${baseUrl}/api/getCart/${getGuestUserId()}`);
+        const res = await axios.get(
+          `${baseUrl}/api/getCart/${getGuestUserId()}`
+        );
+
         setCart(res.data.cart);
         setTotalAmount(res.data.subtotal);
-        setLoader(false);
+
       } catch (error) {
-        alert.error(error.response.data.message);
+        alert.error(error.response?.data?.message);
+      } finally {
         setLoader(false);
       }
     }
@@ -173,10 +176,11 @@ export default function Cart() {
                 :
                 <div className='w-full flex flex-col items-center justify-start gap-6'>
                   {
-                    isGuest || items.length<0 ?
+                    isGuest ?
                       <div className='w-full flex flex-col items-center justify-start gap-10'>
                         {
-                          cart.length === 0 ? <div className='w-full text-left text-gray-500'>Your cart is empty!</div> :
+                          cart.length === 0 ?
+                            <div className='w-full text-left text-gray-500'>Your cart is empty!</div> :
                             cart.map(item => {
                               return (
                                 <div className='w-full flex items-start justify-between'>
@@ -187,7 +191,7 @@ export default function Cart() {
                                     <div className='flex flex-col items-start justify-between gap-2'>
                                       <div className='flex flex-col items-start justify-start gap-1'>
                                         <div className='font-medium text-gray-900'>{item.productId.title}</div>
-                                        <div className='text-sm text-gray-500'>Size: {item.size.name}</div>
+                                        <div className='text-sm text-gray-500'>Size: {item.size?.name}</div>
                                       </div>
                                       <div className='flex items-center justify-center gap-1'>
                                         <div className='text-sm font-medium leading-6 text-gray-900'>Qty:</div>
@@ -226,114 +230,138 @@ export default function Cart() {
                             })
                         }
                       </div> :
-                      <ul className="-my-6 divide-y divide-gray-200 w-full">
+                      <div className='w-full flex flex-col items-center justify-start gap-10'>
                         {
-                          items.length > 0 ?
-                            items?.map((item) => (
-                              <li key={item.id} className="flex py-6">
-                                <Link to={`/product-detail/${item.product?.id}`} className="h-24 w-24 flex-shrink-0 overflow-hidden rounded-md border border-gray-200">
-                                  <img
-                                    src={item.product.thumbnail}
-                                    alt={item.product.title}
-                                    className="h-full w-full object-cover object-center"
-                                  />
-                                </Link>
+                          items.length === 0 ?
+                            <div className='w-full text-left text-gray-500'>Your cart is empty!</div> :
+                            <ul className="-my-6 divide-y divide-gray-200 w-full">
+                              {
+                                items.length > 0 ?
+                                  items?.map((item) => (
+                                    <li key={item.id} className="flex py-6">
+                                      <Link to={`/product-detail/${item.product?.id}`} className="h-24 w-24 flex-shrink-0 overflow-hidden rounded-md border border-gray-200">
+                                        <img
+                                          src={item.product.thumbnail}
+                                          alt={item.product.title}
+                                          className="h-full w-full object-cover object-center"
+                                        />
+                                      </Link>
 
-                                <div className="ml-4 flex flex-1 flex-col">
-                                  <div>
-                                    <div className="flex justify-between text-base font-medium text-gray-900">
-                                      <h3>
-                                        <Link to={`/product-detail/${item.product?.id}`}>{item.product.title}</Link>
-                                      </h3>
-                                      ₹{Math.floor(item.product.price - item.product.price * (item.product.discountPercentage / 100))}
-                                    </div>
-                                    <p className="mt-1 text-sm text-gray-500">
-                                      {item.product.brand}
-                                    </p>
-                                    <p className="mt-1 text-sm text-gray-500">
-                                      Sizes: {item.size.name}
-                                    </p>
-                                  </div>
-                                  <div className="flex flex-1 items-end justify-between text-sm">
-                                    <div className="text-gray-500">
-                                      <label
-                                        htmlFor="quantity"
-                                        className="inline mr-5 text-sm font-medium leading-6 text-gray-900"
-                                      >
-                                        Qty
-                                      </label>
-                                      <select
-                                        onChange={(e) => handleQuantity(e, item)}
-                                        value={item.quantity}
-                                      >
-                                        <option value="1">1</option>
-                                        <option value="2">2</option>
-                                        <option value="3">3</option>
-                                        <option value="4">4</option>
-                                        <option value="5">5</option>
-                                      </select>
-                                    </div>
+                                      <div className="ml-4 flex flex-1 flex-col">
+                                        <div>
+                                          <div className="flex justify-between text-base font-medium text-gray-900">
+                                            <h3>
+                                              <Link to={`/product-detail/${item.product?.id}`}>{item.product.title}</Link>
+                                            </h3>
+                                            ₹{Math.floor(item.product.price - item.product.price * (item.product.discountPercentage / 100))}
+                                          </div>
+                                          <p className="mt-1 text-sm text-gray-500">
+                                            {item.product.brand}
+                                          </p>
+                                          <p className="mt-1 text-sm text-gray-500">
+                                            Sizes: {item.size.name}
+                                          </p>
+                                        </div>
+                                        <div className="flex flex-1 items-end justify-between text-sm">
+                                          <div className="text-gray-500">
+                                            <label
+                                              htmlFor="quantity"
+                                              className="inline mr-5 text-sm font-medium leading-6 text-gray-900"
+                                            >
+                                              Qty
+                                            </label>
+                                            <select
+                                              onChange={(e) => handleQuantity(e, item)}
+                                              value={item.quantity}
+                                            >
+                                              <option value="1">1</option>
+                                              <option value="2">2</option>
+                                              <option value="3">3</option>
+                                              <option value="4">4</option>
+                                              <option value="5">5</option>
+                                            </select>
+                                          </div>
 
-                                    <div className="flex">
-                                      <Modal
-                                        title={`Delete ${item.product.title}`}
-                                        message="Are you sure you want to delete this Cart item ?"
-                                        dangerOption="Delete"
-                                        cancelOption="Cancel"
-                                        dangerAction={(e) => handleRemove(e, item.id)}
-                                        cancelAction={() => setOpenModal(null)}
-                                        showModal={openModal === item.id}
-                                      ></Modal>
-                                      <button
-                                        onClick={(e) => {
-                                          setOpenModal(item.id);
-                                        }}
-                                        type="button"
-                                        className="font-medium text-indigo-600 hover:text-indigo-500"
-                                      >
-                                        Remove
-                                      </button>
-                                    </div>
-                                  </div>
-                                </div>
-                              </li>
-                            )) : <div className='my-4 text-gray-500'>Your cart is empty!</div>
+                                          <div className="flex">
+                                            <Modal
+                                              title={`Delete ${item.product.title}`}
+                                              message="Are you sure you want to delete this Cart item ?"
+                                              dangerOption="Delete"
+                                              cancelOption="Cancel"
+                                              dangerAction={(e) => handleRemove(e, item.id)}
+                                              cancelAction={() => setOpenModal(null)}
+                                              showModal={openModal === item.id}
+                                            ></Modal>
+                                            <button
+                                              onClick={(e) => {
+                                                setOpenModal(item.id);
+                                              }}
+                                              type="button"
+                                              className="font-medium text-indigo-600 hover:text-indigo-500"
+                                            >
+                                              Remove
+                                            </button>
+                                          </div>
+                                        </div>
+                                      </div>
+                                    </li>
+                                  )) : <div className='my-4 text-gray-500'>Your cart is empty!</div>
+                              }
+                            </ul>
                         }
-                      </ul>
+                      </div>
                   }
-                  <div className="border-t border-gray-200 px-4 py-6 sm:px-6 w-full">
-                    <div className="flex justify-between my-2 text-base font-medium text-gray-900">
-                      <p>Subtotal</p>
-                      <p>{INR.format(totalAmount)}</p>
-                    </div>
-                    <div className="flex justify-between my-2 text-base font-medium text-gray-900">
-                      <p>Total Items in Cart</p>
-                      <p>{totalItems} items</p>
-                    </div>
-                    <p className="mt-0.5 text-sm text-gray-500">
-                      Shipping and taxes calculated at checkout.
-                    </p>
-                    <div className="mt-6">
-                      <Link
-                        to="/checkout"
-                        className="flex items-center justify-center rounded-md border border-transparent bg-indigo-600 px-6 py-3 text-base font-medium text-white shadow-sm hover:bg-indigo-700"
-                      >
-                        Checkout
-                      </Link>
-                    </div>
-                    <div className="mt-6 flex justify-center text-center gap-2 text-sm text-gray-500">
-                      <div>or</div>
-                      <Link to="/">
-                        <button
-                          type="button"
-                          className="font-medium text-indigo-600 hover:text-indigo-500"
+
+                  {
+                    (isGuest ? !cart?.length : !items?.length) ? (
+                      <div className="border-t border-gray-200 px-4 py-6 sm:px-6 w-full">
+                        <Link
+                          to="/"
+                          className="flex items-center justify-center rounded-md border border-transparent bg-indigo-600 px-6 py-3 text-base font-medium text-white shadow-sm hover:bg-indigo-700"
                         >
-                          Continue Shopping
-                          <span aria-hidden="true"> &rarr;</span>
-                        </button>
-                      </Link>
-                    </div>
-                  </div>
+                          Shop Now!
+                        </Link>
+                      </div>
+                    ) : (
+                      <div className="border-t border-gray-200 px-4 py-6 sm:px-6 w-full">
+                        <div className="flex justify-between my-2 text-base font-medium text-gray-900">
+                          <p>Subtotal</p>
+                          <p>{INR.format(totalAmount)}</p>
+                        </div>
+
+                        <div className="flex justify-between my-2 text-base font-medium text-gray-900">
+                          <p>Total Items in Cart</p>
+                          <p>{totalItems} items</p>
+                        </div>
+
+                        <p className="mt-0.5 text-sm text-gray-500">
+                          Shipping and taxes calculated at checkout.
+                        </p>
+
+                        <div className="mt-6">
+                          <Link
+                            to="/checkout"
+                            className="flex items-center justify-center rounded-md border border-transparent bg-indigo-600 px-6 py-3 text-base font-medium text-white shadow-sm hover:bg-indigo-700"
+                          >
+                            Checkout
+                          </Link>
+                        </div>
+
+                        <div className="mt-6 flex justify-center text-center gap-2 text-sm text-gray-500">
+                          <div>or</div>
+                          <Link to="/">
+                            <button
+                              type="button"
+                              className="font-medium text-indigo-600 hover:text-indigo-500"
+                            >
+                              Continue Shopping <span aria-hidden="true"> &rarr;</span>
+                            </button>
+                          </Link>
+                        </div>
+                      </div>
+                    )
+
+                  }
                 </div>
               }
             </div>
