@@ -190,8 +190,10 @@ export default function Cart() {
                                     </Link>
                                     <div className='flex flex-col items-start justify-between gap-2'>
                                       <div className='flex flex-col items-start justify-start gap-1'>
-                                        <div className='font-medium text-gray-900'>{item.productId.title}</div>
-                                        <div className='text-sm text-gray-500'>Size: {item.size?.name}</div>
+                                        <Link to={`/product-detail/${item.productId.id}`}>
+                                          <div className='font-medium text-gray-900'>{item.productId.title}</div>
+                                        </Link>
+                                        <div className='text-sm text-gray-500'>Size: {item.size}</div>
                                       </div>
                                       <div className='flex items-center justify-center gap-1'>
                                         <div className='text-sm font-medium leading-6 text-gray-900'>Qty:</div>
@@ -253,13 +255,13 @@ export default function Cart() {
                                             <h3>
                                               <Link to={`/product-detail/${item.product?.id}`}>{item.product.title}</Link>
                                             </h3>
-                                            ₹{Math.floor(item.product.price - item.product.price * (item.product.discountPercentage / 100))}
+                                            {INR.format(Math.floor(item.quantity * (item.product.price - item.product.price * (item.product.discountPercentage / 100))))}
                                           </div>
                                           <p className="mt-1 text-sm text-gray-500">
                                             {item.product.brand}
                                           </p>
                                           <p className="mt-1 text-sm text-gray-500">
-                                            Sizes: {item.size.name}
+                                            Size: {item.size}
                                           </p>
                                         </div>
                                         <div className="flex flex-1 items-end justify-between text-sm">
@@ -343,7 +345,7 @@ export default function Cart() {
                             to="/checkout"
                             className="flex items-center justify-center rounded-md border border-transparent bg-indigo-600 px-6 py-3 text-base font-medium text-white shadow-sm hover:bg-indigo-700"
                           >
-                            Checkout
+                            Checkout {isGuest ? 'as Guest' : null}
                           </Link>
                         </div>
 

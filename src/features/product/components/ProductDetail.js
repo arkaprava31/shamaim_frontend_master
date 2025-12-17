@@ -84,14 +84,13 @@ export default function ProductDetail() {
     const productprice = product.price;
     const discountpercentage = product.discountPercentage;
     const actualvalue = productprice * (discountpercentage / 100);
-
-    console.log("items =", items);
+    
 
     const matcheditemSized = Array.isArray(items)
       ? items.find(
         (item) =>
           item.product?.id === product?.id &&
-          item.size?.name === selectedSize?.name
+          item.size === selectedSize
       )
       : null;
 
@@ -116,10 +115,10 @@ export default function ProductDetail() {
           handleLoggedInOrGuest();
 
         } else {
-          alert.error("please select size ");
+          alert.error("Please select size to continue.");
         }
       } else {
-        alert.error("Item Already added");
+        alert.error("Product already in cart with same size.");
       }
     } else {
       try {
@@ -130,8 +129,6 @@ export default function ProductDetail() {
           qty: 1,
           size: selectedSize
         };
-
-        console.log("New item=", newItem);
         
         if (selectedSize) {
           if (getGuestUserId()) {
