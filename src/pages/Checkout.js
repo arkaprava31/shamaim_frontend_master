@@ -14,6 +14,7 @@ import { updateUserAsync } from "../features/user/userSlice";
 import { useState } from "react";
 import {
   createOrderAsync,
+  createPrepaidOrderAsync,
   selectCurrentOrder,
   selectStatus,
 } from "../features/order/orderSlice";
@@ -156,8 +157,8 @@ function Checkout() {
 
   const [selectedAddress, setSelectedAddress] = useState(null);
 
-  const [paymentMethod, setPaymentMethod] = useState("cash"); // For testing purpose
-  // const [paymentMethod, setPaymentMethod] = useState("online"); // default payment method (No COD)
+  // const [paymentMethod, setPaymentMethod] = useState("cash"); // For testing purpose
+  const [paymentMethod, setPaymentMethod] = useState("Prepaid"); // default payment method (No COD)
 
   // const handleQuantity = (e, item) => {
   //   dispatch(updateCartAsync({ id: item.id, quantity: +e.target.value }));
@@ -237,7 +238,7 @@ function Checkout() {
     const index = Number(e.target.value);
     setSelectedAddressIndex(index);
     setSelectedAddress(user.addresses[index]);
-    setState(false);
+    setFormOpenState(false);
   };
 
   const handleEditAddress = (index) => {
@@ -254,7 +255,7 @@ function Checkout() {
     });
 
     setSelectedAddressIndex(index);
-    setState(true);
+    setFormOpenState(true);
   };
 
   const handleRemoveAddress = (index) => {
@@ -272,7 +273,7 @@ function Checkout() {
         setSelectedAddress(null);
         setSelectedAddressIndex(null);
       }
-      setState(false);
+      setFormOpenState(false);
       alert.success("Shipping details removed successfully!");
     } catch (error) {
       alert.error("Failed to remove shipping details.");
@@ -348,12 +349,13 @@ function Checkout() {
           paymentMethod: "cash"
         };
 
-        dispatch(createOrderAsync(order));
-
-        await clearUserCart();
-
-        navigation(`/order-success/${getGuestUserId()}`);
-
+        try {
+          const savedOrder = await dispatch(createOrderAsync(order)).unwrap();
+          navigation(`/order-success/${savedOrder.id}`);
+          await clearUserCart();
+        } catch (err) {
+          console.error("Order failed:", err);
+        }
       } else {
         // alert.error("Enter Address and Payment method");
         alert.error("Select Shipping Details to continue");
@@ -391,8 +393,12 @@ function Checkout() {
           paymentMethod: "cash"
         };
 
-        dispatch(createOrderAsync(order));
-        navigation(`/order-success/${user.id}`);
+        try {
+          const savedOrder = await dispatch(createOrderAsync(order)).unwrap();
+          navigation(`/order-success/${savedOrder.id}`);
+        } catch (err) {
+          console.error("Order failed:", err);
+        }
 
       } else {
         // alert.error("Enter Address and Payment method");
@@ -401,83 +407,186 @@ function Checkout() {
     }
   };
 
+  // ===============================================================================================
+
+  const createRazorpayOrder = async () => {
+    const res = await axios.post(baseUrl + "/orders/create", {
+      amount: totalAmount,
+    });
+    return res.data;
+  };
+
+  const openRazorpay = async () => {
+    try {
+      const razorpayOrder = await createRazorpayOrder();
+
+      const options = {
+        key: "rzp_live_3vTiOMXqTXi6Si",
+        amount: razorpayOrder.amount,
+        currency: razorpayOrder.currency,
+        name: "Shamaim Lifestyle",
+        order_id: razorpayOrder.id,
+
+        handler: async function (rpResponse) {
+          try {
+            const orderPayload = {
+              firstName: guestAddress.name?.split(" ")[0] || "",
+              lastName: guestAddress.name?.split(" ")[1] || "",
+              addressLine1: guestAddress.address?.street,
+              addressLine2: "",
+              city: guestAddress.address?.city,
+              pincode: guestAddress.address?.pinCode,
+              state: guestAddress.address?.state,
+              email: guestAddress.email,
+              phone: guestAddress.address?.phone,
+
+              items: cart.map((item) => ({
+                id: item.productId.id,
+                sku: item.productId.id,
+                name: item.productId.title,
+                units: item.qty,
+                quantity: item.qty,
+                selling_price: Math.floor(
+                  item.productId.price -
+                  item.productId.price *
+                  (item.productId.discountPercentage / 100)
+                ),
+                thumbnail: item.productId.thumbnail,
+                selectedAddress: {
+                  name: guestAddress.name,
+                  email: guestAddress.email,
+                  phone: guestAddress.address?.phone,
+                  street: guestAddress.address?.street,
+                  city: guestAddress.address?.city,
+                  state: guestAddress.address?.state,
+                  pinCode: guestAddress.address?.pinCode
+                },
+                size: item.size,
+                productid: item.productId.id,
+              })),
+
+              paymentMethod: "prepaid",
+
+              paymentDetails: {
+                payMode: "Prepaid",
+                razorpay_payment_id: rpResponse.razorpay_payment_id,
+                razorpay_order_id: rpResponse.razorpay_order_id,
+                razorpay_signature: rpResponse.razorpay_signature
+              },
+
+              user: getGuestUserId(),
+              totalItems: cart.length,
+              totalAmount
+            };
+
+            const savedOrder = await dispatch(createPrepaidOrderAsync(orderPayload)).unwrap();
+            navigation(`/order-success/${savedOrder.id}`);
+
+            await clearUserCart();
+
+          } catch (err) {
+            console.error("Prepaid order failed", err);
+          }
+        },
+
+        prefill: {
+          name: guestAddress.name,
+          email: guestAddress.email,
+          contact: guestAddress.address?.phone,
+        },
+
+        theme: { color: "#3399cc" },
+      };
+
+      new window.Razorpay(options).open();
+    } catch (err) {
+      console.error("Razorpay init failed:", err);
+    }
+  };
+
+  const openRazorpayForLoggedIn = async () => {
+    try {
+      const razorpayOrder = await createRazorpayOrder();
+
+      const options = {
+        key: "rzp_live_3vTiOMXqTXi6Si",
+        amount: razorpayOrder.amount,
+        currency: razorpayOrder.currency,
+        name: "Shamaim Lifestyle",
+        order_id: razorpayOrder.id,
+
+        handler: async function (rpResponse) {
+          try {
+            const order = {
+              firstName: selectedAddress.name?.split(" ")[0] || "",
+              lastName: selectedAddress.name?.split(" ")[1] || "",
+              addressLine1: selectedAddress.street,
+              addressLine2: "",
+              city: selectedAddress.city,
+              pincode: selectedAddress.pinCode,
+              state: selectedAddress.state,
+              email: selectedAddress.email,
+              phone: selectedAddress.phone,
+
+              items: items.map((item) => ({
+                id: item.id,
+                sku: item.id,
+                name: item.product.title,
+                units: item.quantity,
+                quantity: item.quantity,
+                selling_price: Math.floor(
+                  item.product.price -
+                  item.product.price * (item.product.discountPercentage / 100)
+                ),
+                thumbnail: item.product.thumbnail,
+                selectedAddress: selectedAddress,
+                size: item.size,
+                productid: item.product.id,
+              })),
+
+              paymentMethod: "prepaid",
+
+              paymentDetails: {
+                payMode: "Prepaid",
+                razorpay_payment_id: rpResponse.razorpay_payment_id,
+                razorpay_order_id: rpResponse.razorpay_order_id,
+                razorpay_signature: rpResponse.razorpay_signature,
+              },
+
+              user: user.id,
+              totalItems: totalItems,
+              totalAmount: totalAmount,
+            };
+
+            const savedOrder = await dispatch(createPrepaidOrderAsync(order)).unwrap();
+            navigation(`/order-success/${savedOrder.id}`);
+
+          } catch (err) {
+            console.error("Prepaid order failed", err);
+          }
+        },
+
+        prefill: {
+          name: selectedAddress?.name,
+          email: selectedAddress?.email,
+          contact: selectedAddress?.phone,
+        },
+
+        theme: { color: "#3399cc" },
+      };
+
+      new window.Razorpay(options).open();
+    } catch (err) {
+      console.error("Razorpay init failed:", err);
+    }
+  };
+
   const initiatePayment = async () => {
     if (getGuestUserId()) {
       if (Object.keys(guestAddress).length > 0 && paymentMethod) {
 
-        try {
-          const response = await axios.post(baseUrl + "/orders/create", {
-            amount: totalAmount,
-          });
-          const data = response.data;
-          const options = {
-            key: "rzp_live_3vTiOMXqTXi6Si",
-            amount: data.amount,
-            currency: data.currency,
-            name: "Shamaim Lifestyle",
-            description: "Payment for Order",
-            order_id: data.id,
-            handler: async function (response) {
-              const order = {
-                firstName: guestAddress.name.split(" ")[0] || "",
-                lastName: guestAddress.name.split(" ")[1] || "",
-                addressLine1: selectedAddress.street,
-                addressLine2: "",
-                city: guestAddress.address?.city,
-                pincode: guestAddress.address?.pinCode,
-                state: guestAddress.address?.state,
-                email: guestAddress.email,
-                phone: guestAddress.address?.phone,
-                items: cart.map((item) => ({
-                  id: item.productId.id,
-                  sku: item.productId.id,
-                  name: item.productId.title,
-                  units: item.qty,
-                  selling_price: (Math.floor(item.productId.price - item.productId.price * (item.productId.discountPercentage / 100)
-                  )),
-                  thumbnail: item.productId.thumbnail,
-                  selectedAddress: {
-                    name: guestAddress.name,
-                    email: guestAddress.email,
-                    phone: guestAddress.address?.phone,
-                    street: guestAddress.address?.street,
-                    city: guestAddress.address?.city,
-                    state: guestAddress.address?.state,
-                    pinCode: guestAddress.address?.pinCode
-                  },
-                  quantity: item.qty,
-                  size: item.size
-                })),
-                paymentDetails: { payMode: "card" },
-                user: getGuestUserId(),
-                totalItems: cart.length,
-                totalAmount: totalAmount,
-                paymentMethod: "online"
-              };
+        await openRazorpay();
 
-              dispatch(createOrderAsync(order));
-
-              await clearUserCart();
-
-              navigation(`/order-success/${getGuestUserId()}`);
-            },
-            prefill: {
-              name: guestAddress.name,
-              email: guestAddress.email,
-              contact: guestAddress.address?.phone,
-            },
-            notes: {
-              address: "Razorpay Corporate Office",
-            },
-            theme: {
-              color: "#3399cc",
-            },
-          };
-          const razorpay = new window.Razorpay(options);
-          razorpay.open();
-        } catch (error) {
-          console.error("Error creating order:", error);
-        }
       } else {
         // alert.error("Enter Address and Payment method");
         alert.error("Select Shipping Details to continue");
@@ -486,65 +595,9 @@ function Checkout() {
       if (selectedAddress && paymentMethod) {
 
         try {
-          const response = await axios.post(baseUrl + "/orders/create", {
-            amount: totalAmount,
-          });
-          const data = response.data;
-          // setOrderId(data.id);
-          const options = {
-            key: "rzp_live_3vTiOMXqTXi6Si",
-            amount: data.amount,
-            currency: data.currency,
-            name: "Shamaim Lifestyle",
-            description: "Payment for Order",
-            order_id: data.id,
-            handler: async function (response) {
-              const order = {
-                firstName: selectedAddress.name.split(" ")[0] || "",
-                lastName: selectedAddress.name.split(" ")[1] || "",
-                addressLine1: selectedAddress.street,
-                addressLine2: "",
-                city: selectedAddress.city,
-                pincode: selectedAddress.pinCode,
-                state: selectedAddress.state,
-                email: selectedAddress.email,
-                phone: selectedAddress.phone,
-                items: items.map((item) => ({
-                  id: item.id,
-                  sku: item.id,
-                  name: item.product.title,
-                  units: item.quantity,
-                  selling_price: (Math.floor(item.product.price - item.product.price * (item.product.discountPercentage / 100)
-                  )),
-                  thumbnail: item.product.thumbnail,
-                  selectedAddress: selectedAddress,
-                  quantity: totalItems,
-                  size: item.size
-                })),
-                paymentDetails: { payMode: "card" },
-                user: user.id,
-                totalItems: totalItems,
-                totalAmount: totalAmount,
-                paymentMethod: "online"
-              };
 
-              let res = await dispatch(createOrderAsync(order));
-              navigation(`/order-success/${user.id}`);
-            },
-            prefill: {
-              name: selectedAddress.name,
-              email: selectedAddress.email,
-              contact: selectedAddress.phone,
-            },
-            notes: {
-              address: "Razorpay Corporate Office",
-            },
-            theme: {
-              color: "#3399cc",
-            },
-          };
-          const razorpay = new window.Razorpay(options);
-          razorpay.open();
+          await openRazorpayForLoggedIn();
+
         } catch (error) {
           console.error("Error creating order:", error);
         }
@@ -555,7 +608,7 @@ function Checkout() {
     }
   };
 
-  const [sttate, setState] = useState(false);
+  const [formOpenState, setFormOpenState] = useState(false);
 
   const handleAddresstoogle = () => {
     clearAddress();
@@ -573,7 +626,7 @@ function Checkout() {
         pinCode: guestAddress.address?.pinCode || "",
       });
     }
-    setState(true);
+    setFormOpenState(true);
   };
 
   const fetchCart = async () => {
@@ -653,7 +706,7 @@ function Checkout() {
         <div className="px-4 mx-auto max-w-7xl sm:px-6 lg:px-8 mt-12">
           <div className="grid grid-cols-1 gap-x-8 gap-y-10 lg:grid-cols-5">
             <div className="lg:col-span-3">
-              <div className={`${sttate ? (Object.keys(guestAddress)?.length === 0 ? 'pb-4' : 'border-b-0') : 'pb-10'} border-b border-gray-900/10`}>
+              <div className={`${formOpenState ? (Object.keys(guestAddress)?.length === 0 ? 'pb-4' : 'border-b-0') : 'pb-10'} border-b border-gray-900/10`}>
                 <h2 className="text-2xl font-semibold leading-7 text-gray-900">
                   Shipping Details
                 </h2>
@@ -759,12 +812,12 @@ function Checkout() {
                 {/* button add address */}
 
                 <button onClick={handleAddresstoogle}
-                  className={`px-3 py-2 mt-2 text-sm font-normal text-white rounded-md ${Object.keys(guestAddress).length != 0 ? 'bg-amber-500 hover:bg-amber-600' : 'bg-blue-700 hover:bg-blue-800'} ${sttate ? 'hidden' : ''}`}>
+                  className={`px-3 py-2 mt-2 text-sm font-normal text-white rounded-md ${Object.keys(guestAddress).length != 0 ? 'bg-amber-500 hover:bg-amber-600' : 'bg-blue-700 hover:bg-blue-800'} ${formOpenState ? 'hidden' : ''}`}>
                   {isGuest ? (Object.keys(guestAddress).length != 0 ? 'Edit' : 'Add') : (user?.addresses.length === 0 ? 'Add' : 'Add new')} shipping details
                 </button>
               </div>
               {/* This form is for address */}
-              {sttate &&
+              {formOpenState &&
                 <form
                   className="p-6 rounded-lg mt-6 bg-white"
                   noValidate
@@ -793,7 +846,7 @@ function Checkout() {
 
                     reset();
                     setSelectedAddressIndex(null);
-                    setState(false);
+                    setFormOpenState(false);
                   })}
 
                 >
@@ -997,7 +1050,7 @@ function Checkout() {
                     </div>
 
                     <div className="flex items-center justify-end gap-x-6">
-                      <button onClick={() => setState(false)} type="button"
+                      <button onClick={() => setFormOpenState(false)} type="button"
                         className="text-sm font-semibold leading-6 text-red-600">Close</button>
                       <button
                         onClick={() => clearAddress()}

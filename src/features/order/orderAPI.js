@@ -12,6 +12,18 @@ export function createOrder(order) {
   });
 }
 
+export function createPrepaidOrder(order) {
+  return new Promise(async (resolve) => {
+    const response = await fetch(baseUrl+'/orders/prepaid/confirm', {
+      method: 'POST',
+      body: JSON.stringify(order),
+      headers: { 'content-type': 'application/json' },
+    });
+    const data = await response.json();
+    resolve({ data });
+  });
+}
+
 export function updateOrder(order) {
   return new Promise(async (resolve) => {
     const response = await fetch(baseUrl+'/orders/'+order.id, {

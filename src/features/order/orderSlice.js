@@ -1,5 +1,5 @@
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
-import { createOrder, fetchAllOrders,updateOrder } from './orderAPI';
+import { createOrder, createPrepaidOrder, fetchAllOrders,updateOrder } from './orderAPI';
 
 const initialState = {
   orders: [],
@@ -17,6 +17,16 @@ export const createOrderAsync = createAsyncThunk(
     return response.data;
   }
 );
+
+export const createPrepaidOrderAsync = createAsyncThunk(
+  'order/createPrepaidOrder',
+  async (order) => {
+    const response = await createPrepaidOrder(order);
+    // The value we return becomes the `fulfilled` action payload
+    return response.data;
+  }
+);
+
 export const updateOrderAsync = createAsyncThunk(
   'order/updateOrder',
   async (order) => {
