@@ -58,16 +58,13 @@ function Checkout() {
 
   const [isCouponApplied, setIsCouponApplied] = useState(false);
   const [amountBeforeCoupon, setAmountBeforeCoupon] = useState(null);
-  const [activeCouponCode, setActiveCouponCode] = useState({ activeCoupon: null, discountAmount: null });
+  const [activeCouponCode, setActiveCouponCode] = useState([]);
 
   const getActiveCouponCode = async () => {
     setLoader(true);
     try {
       const res = await axios.get(`${baseUrl}/constants/getActiveCouponCode`);
-      setActiveCouponCode({
-        activeCoupon: res.data.code,
-        discountAmount: res.data.amountValue
-      });
+      setActiveCouponCode(res.data);
       setLoader(false);
     } catch (error) {
       alert.error(error.response.data.message);
@@ -83,29 +80,36 @@ function Checkout() {
   }, [items]);
 
   const handleClick = () => {
-    if (couponCode && couponCode.length > 0) {
-      if (couponCode === activeCouponCode.activeCoupon) {
-        alert.success("Coupon applied sucessfully");
-        if (getGuestUserId()) {
-          setAmountBeforeCoupon(totalAmount);
-          setTotalAmount(totalAmount - Number(activeCouponCode.discountAmount));
-          setIsCouponApplied(true);
-        } else {
-          const initialTotalAmount = calculateTotalAmount(items);
-          setAmountBeforeCoupon(initialTotalAmount);
-          setTotalAmount(initialTotalAmount - Number(activeCouponCode.discountAmount));
-          setIsCouponApplied(true);
-        }
-      }
-      else {
-        alert.error("Coupon code is invalid");
-        setIsCouponApplied(false);
-      }
-    }
-    else {
+    if (!couponCode || couponCode.trim().length === 0) {
       alert.error("Can't apply empty coupon code!");
       setIsCouponApplied(false);
+      return;
     }
+
+    const matchedCoupon = activeCouponCode.find(
+      (coupon) => coupon.code === couponCode.trim()
+    );
+
+    if (!matchedCoupon) {
+      alert.error("Coupon code is invalid");
+      setIsCouponApplied(false);
+      return;
+    }
+
+    alert.success("Coupon applied successfully");
+
+    const discountAmount = Number(matchedCoupon.amountValue);
+
+    if (getGuestUserId()) {
+      setAmountBeforeCoupon(totalAmount);
+      setTotalAmount(Math.max(0, totalAmount - discountAmount));
+    } else {
+      const initialTotalAmount = calculateTotalAmount(items);
+      setAmountBeforeCoupon(initialTotalAmount);
+      setTotalAmount(Math.max(0, initialTotalAmount - discountAmount));
+    }
+
+    setIsCouponApplied(true);
   };
 
   const removeCoupon = () => {
@@ -704,7 +708,7 @@ function Checkout() {
         </div>
       ) : (
         <div className="px-4 mx-auto max-w-7xl sm:px-6 lg:px-8 mt-12">
-          <div className="grid grid-cols-1 gap-x-8 gap-y-10 lg:grid-cols-5">
+          <div className="grid grid-cols-1 gap-x-20 gap-y-10 lg:grid-cols-5">
             <div className="lg:col-span-3">
               <div className={`${formOpenState ? (Object.keys(guestAddress)?.length === 0 ? 'pb-4' : 'border-b-0') : 'pb-10'} border-b border-gray-900/10`}>
                 <h2 className="text-2xl font-semibold leading-7 text-gray-900">
@@ -1151,14 +1155,43 @@ function Checkout() {
                     </div>
                   </div> */}
 
-                  <div className="w-fit flex items-center justify-start mt-4 gap-2 border-2 border-[#012652] rounded-md p-2 px-4 bg-white">
+                  {/* <div className="w-fit flex items-center justify-start mt-4 gap-2 border-2 border-[#012652] rounded-md p-2 px-4 bg-white">
                     <div className="text-[#0D94FB] text-base font-medium">Pay Securely via UPI, Wallet, Cards & Net Banking through</div>
                     <img src={"razorpay-icon.svg"} alt="razorpay_icon" className="w-24 h-auto object-contain object-center" />
+                  </div> */}
+
+                  <div className="relative mt-6 flex items-center gap-5 rounded-2xl border border-indigo-200 bg-white/80 p-5 shadow-[0_10px_30px_-10px_rgba(79,70,229,0.35)] backdrop-blur-md ring-1 ring-indigo-500/30">
+
+                    {/* Selected Pill */}
+                    <span className="absolute -top-3 left-5 rounded-full bg-gradient-to-r from-indigo-600 to-blue-600 px-4 py-1 pb-[0.3125rem] text-xs font-semibold text-white shadow-md">
+                      ✓ Selected
+                    </span>
+
+                    {/* Accent Bar */}
+                    <div className="h-10 w-1 rounded-full bg-gradient-to-b from-indigo-600 to-blue-500" />
+
+                    {/* Text Content */}
+                    <div className="flex flex-col gap-1">
+                      <p className="text-base font-semibold text-gray-900">
+                        Pay securely with Razorpay
+                      </p>
+                      <p className="text-xs text-gray-600">
+                        UPI, Wallets, Cards & Net Banking
+                      </p>
+                    </div>
+
+                    <img
+                      src="razorpay-icon.svg"
+                      alt="razorpay"
+                      className="ml-auto w-24 opacity-90"
+                    />
                   </div>
+
                 </fieldset>
               </div>
 
             </div>
+
             <div className="lg:col-span-2">
               <div className="p-4 mx-auto bg-white rounded-lg">
                 <div className="">
