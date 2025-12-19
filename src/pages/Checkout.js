@@ -355,6 +355,8 @@ function Checkout() {
 
         try {
           const savedOrder = await dispatch(createOrderAsync(order)).unwrap();
+          setLoader(true);
+
           navigation(`/order-success/${savedOrder.id}`);
           await clearUserCart();
         } catch (err) {
@@ -399,6 +401,8 @@ function Checkout() {
 
         try {
           const savedOrder = await dispatch(createOrderAsync(order)).unwrap();
+          setLoader(true);
+
           navigation(`/order-success/${savedOrder.id}`);
         } catch (err) {
           console.error("Order failed:", err);
@@ -484,8 +488,9 @@ function Checkout() {
             };
 
             const savedOrder = await dispatch(createPrepaidOrderAsync(orderPayload)).unwrap();
-            navigation(`/order-success/${savedOrder.id}`);
+            setLoader(true);
 
+            navigation(`/order-success/${savedOrder.id}`);
             await clearUserCart();
 
           } catch (err) {
@@ -563,8 +568,9 @@ function Checkout() {
             };
 
             const savedOrder = await dispatch(createPrepaidOrderAsync(order)).unwrap();
-            navigation(`/order-success/${savedOrder.id}`);
+            setLoader(true);
 
+            navigation(`/order-success/${savedOrder.id}`);
           } catch (err) {
             console.error("Prepaid order failed", err);
           }
