@@ -52,7 +52,7 @@ function OrderSuccessPage() {
     <>
       {!params.id && <Navigate to='/' replace={true}></Navigate>}
       <main className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <div className="w-full max-w-lg rounded-2xl bg-white shadow-xl p-8 text-center">
+        <div className="w-full max-w-lg rounded-2xl bg-white shadow-xl p-8 text-center -mt-12">
 
           {/* Success Icon */}
           <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-green-100">

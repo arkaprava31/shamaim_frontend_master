@@ -154,7 +154,7 @@ export default function Cart() {
       {!items.length && cartLoaded && <Navigate to="/" replace={true}></Navigate>} */}
 
       <div>
-        <div className="mx-auto  bg-white max-w-7xl px-4 sm:px-6 lg:px-8">
+        <div className="mx-auto bg-white max-w-7xl px-2 sm:px-6 lg:px-8">
           <div className="border-t border-gray-200 px-4 py-6 sm:px-6">
             <h1 className="text-4xl my-5 font-bold tracking-tight text-gray-900">
               Cart
@@ -191,14 +191,16 @@ export default function Cart() {
                                     <div className='flex flex-col items-start justify-between gap-2'>
                                       <div className='flex flex-col items-start justify-start gap-1'>
                                         <Link to={`/product-detail/${item.productId.id}`}>
-                                          <div className='font-medium text-gray-900'>{item.productId.title}</div>
+                                          <div className='font-medium text-gray-900 truncate max-w-[12rem] md:max-w-[25rem] lg:overflow-visible'>
+                                            {item.productId.title}
+                                          </div>
                                         </Link>
                                         <div className='text-sm text-gray-500'>Size: {item.size}</div>
                                       </div>
                                       <div className='flex items-center justify-center gap-1'>
                                         <div className='text-sm font-medium leading-6 text-gray-900'>Qty:</div>
                                         <select value={item.qty} onChange={(e) => handleQtyChange(e, item._id)}
-                                          className='outline-none'>
+                                          className='outline-none text-sm text-gray-900'>
                                           {
                                             qtyOptions.map(opt => {
                                               return (
@@ -252,7 +254,7 @@ export default function Cart() {
                                       <div className="ml-4 flex flex-1 flex-col">
                                         <div>
                                           <div className="flex justify-between text-base font-medium text-gray-900">
-                                            <h3>
+                                            <h3 className='truncate max-w-[12rem]  md:max-w-[25rem] lg:overflow-visible'>
                                               <Link to={`/product-detail/${item.product?.id}`}>{item.product.title}</Link>
                                             </h3>
                                             {INR.format(Math.floor(item.quantity * (item.product.price - item.product.price * (item.product.discountPercentage / 100))))}
@@ -268,19 +270,21 @@ export default function Cart() {
                                           <div className="text-gray-500">
                                             <label
                                               htmlFor="quantity"
-                                              className="inline mr-5 text-sm font-medium leading-6 text-gray-900"
+                                              className="inline mr-2 text-sm font-medium leading-6 text-gray-900"
                                             >
-                                              Qty
+                                              Qty:
                                             </label>
-                                            <select
+                                            <select className='text-sm outline-none text-gray-900'
                                               onChange={(e) => handleQuantity(e, item)}
                                               value={item.quantity}
                                             >
-                                              <option value="1">1</option>
-                                              <option value="2">2</option>
-                                              <option value="3">3</option>
-                                              <option value="4">4</option>
-                                              <option value="5">5</option>
+                                              {
+                                                qtyOptions.map(opt => {
+                                                  return (
+                                                    <option value={opt}>{opt}</option>
+                                                  )
+                                                })
+                                              }
                                             </select>
                                           </div>
 
@@ -316,7 +320,7 @@ export default function Cart() {
 
                   {
                     (isGuest ? !cart?.length : !items?.length) ? (
-                      <div className="border-t border-gray-200 px-4 py-6 sm:px-6 w-full">
+                      <div className="border-t border-gray-200 px-0 py-6 sm:px-6 w-full">
                         <Link
                           to="/"
                           className="flex items-center justify-center rounded-md border border-transparent bg-indigo-600 px-6 py-3 text-base font-medium text-white shadow-sm hover:bg-indigo-700"
@@ -325,7 +329,7 @@ export default function Cart() {
                         </Link>
                       </div>
                     ) : (
-                      <div className="border-t border-gray-200 px-4 py-6 sm:px-6 w-full">
+                      <div className="border-t border-gray-200 px-0 py-6 sm:px-6 w-full">
                         <div className="flex justify-between my-2 text-base font-medium text-gray-900">
                           <p>Subtotal</p>
                           <p>{INR.format(totalAmount)}</p>

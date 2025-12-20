@@ -355,6 +355,8 @@ function Checkout() {
 
         try {
           const savedOrder = await dispatch(createOrderAsync(order)).unwrap();
+          setLoader(true);
+
           navigation(`/order-success/${savedOrder.id}`);
           await clearUserCart();
         } catch (err) {
@@ -399,6 +401,8 @@ function Checkout() {
 
         try {
           const savedOrder = await dispatch(createOrderAsync(order)).unwrap();
+          setLoader(true);
+
           navigation(`/order-success/${savedOrder.id}`);
         } catch (err) {
           console.error("Order failed:", err);
@@ -484,8 +488,9 @@ function Checkout() {
             };
 
             const savedOrder = await dispatch(createPrepaidOrderAsync(orderPayload)).unwrap();
-            navigation(`/order-success/${savedOrder.id}`);
+            setLoader(true);
 
+            navigation(`/order-success/${savedOrder.id}`);
             await clearUserCart();
 
           } catch (err) {
@@ -563,8 +568,9 @@ function Checkout() {
             };
 
             const savedOrder = await dispatch(createPrepaidOrderAsync(order)).unwrap();
-            navigation(`/order-success/${savedOrder.id}`);
+            setLoader(true);
 
+            navigation(`/order-success/${savedOrder.id}`);
           } catch (err) {
             console.error("Prepaid order failed", err);
           }
@@ -708,7 +714,7 @@ function Checkout() {
         </div>
       ) : (
         <div className="px-4 mx-auto max-w-7xl sm:px-6 lg:px-8 mt-12">
-          <div className="grid grid-cols-1 gap-x-20 gap-y-10 lg:grid-cols-5">
+          <div className="grid grid-cols-1 gap-x-20 gap-y-6 lg:gap-y-10 lg:grid-cols-5">
             <div className="lg:col-span-3">
               <div className={`${formOpenState ? (Object.keys(guestAddress)?.length === 0 ? 'pb-4' : 'border-b-0') : 'pb-10'} border-b border-gray-900/10`}>
                 <h2 className="text-2xl font-semibold leading-7 text-gray-900">
@@ -1193,7 +1199,7 @@ function Checkout() {
             </div>
 
             <div className="lg:col-span-2">
-              <div className="p-4 mx-auto bg-white rounded-lg">
+              <div className="p-4 mx-auto bg-white rounded-lg mb-10 lg:mb-0">
                 <div className="">
                   <h1 className="text-2xl font-bold tracking-tight text-gray-900">
                     Order Summary
@@ -1213,7 +1219,7 @@ function Checkout() {
                                     </Link>
                                     <div className='flex flex-col items-start justify-between gap-2'>
                                       <div className='flex flex-col items-start justify-start gap-1'>
-                                        <div className='font-medium text-gray-900 truncate max-w-[15rem]'>{item.productId.title}</div>
+                                        <div className='font-medium text-gray-900 truncate max-w-[10rem] md:max-w-[15rem]'>{item.productId.title}</div>
                                         <div className='text-sm text-gray-500'>Size: {item.size}</div>
                                       </div>
                                       <div className='flex items-center justify-center gap-1'>
@@ -1256,7 +1262,7 @@ function Checkout() {
                                     </Link>
                                     <div className='flex flex-col items-start justify-between gap-2'>
                                       <div className='flex flex-col items-start justify-start gap-1'>
-                                        <div className='font-medium text-gray-900 truncate max-w-[15rem]'>{item.product.title}</div>
+                                        <div className='font-medium text-gray-900 truncate max-w-[10rem] md:max-w-[15rem]'>{item.product.title}</div>
                                         <div className='text-sm text-gray-500'>Size: {item.size}</div>
                                       </div>
                                       <div className='flex items-center justify-center gap-1'>
