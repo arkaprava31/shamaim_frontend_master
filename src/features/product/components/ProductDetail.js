@@ -171,6 +171,8 @@ export default function ProductDetail() {
   return (
     <div className="bg-white ">
       {status === "loading" ? (
+        <div className="flex items-center justify-center h-screen bg-white">
+
         <Grid
           height="200"
           width="150"
@@ -181,6 +183,7 @@ export default function ProductDetail() {
           wrapperClass=""
           visible={true}
         />
+        </div>
       ) : null}
       {product && (
         <>
