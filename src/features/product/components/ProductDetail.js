@@ -177,17 +177,18 @@ export default function ProductDetail() {
   return (
     <div className="bg-white">
       {status === "loading" ? (
-        <div className="w-full flex items-center justify-center py-4">
-          <Grid
-            height="200"
-            width="150"
-            color="rgb(79, 70, 229) "
-            ariaLabel="grid-loading"
-            radius="12.5"
-            wrapperStyle={{}}
-            wrapperClass=""
-            visible={true}
-          />
+        <div className="flex items-center justify-center h-screen bg-white">
+
+        <Grid
+          height="200"
+          width="150"
+          color="rgb(79, 70, 229) "
+          ariaLabel="grid-loading"
+          radius="12.5"
+          wrapperStyle={{}}
+          wrapperClass=""
+          visible={true}
+        />
         </div>
       ) : null}
       {product && (

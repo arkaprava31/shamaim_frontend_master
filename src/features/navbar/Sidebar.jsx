@@ -10,6 +10,7 @@ import Logo from "./sitelogo.png";
 import { useState } from 'react';
 import { IoClose } from 'react-icons/io5';
 
+
 const Sidebar = ({ toggle, handleClick }) => {
   const [dropdown, setDropdown] = useState({}); // Store the open/close state for each dropdown
 
@@ -54,7 +55,7 @@ const Sidebar = ({ toggle, handleClick }) => {
       subcategories: [
         {
           name: 'Hoodies',
-          link: null, // No direct navigation for Hoodies
+          link: null,
           subcategories: [
             {
               name: 'Classic Fit', link: '/men/hoodies/crewneck',
@@ -74,7 +75,7 @@ const Sidebar = ({ toggle, handleClick }) => {
         },
         {
           name: 'T-Shirts',
-          link: "/men", // No direct navigation for Hoodies
+          link: "/men",
           subcategories: [
             {
               name: 'Classic Fit', link: '/men/crewneck',
@@ -107,7 +108,7 @@ const Sidebar = ({ toggle, handleClick }) => {
       subcategories: [
         {
           name: 'Hoodies',
-          link: null, // No direct navigation for Hoodies
+          link: null,
           subcategories: [
             {
               name: 'Classic Fit', link: '/women/hoodies/crewneck',
@@ -127,7 +128,7 @@ const Sidebar = ({ toggle, handleClick }) => {
         },
         {
           name: 'T-Shirts',
-          link: "/women", // No direct navigation for Hoodies
+          link: "/women",
           subcategories: [
             {
               name: 'Classic Fit', link: '/women/crewneck',
@@ -141,6 +142,13 @@ const Sidebar = ({ toggle, handleClick }) => {
               subcategories: [
                 { name: 'Solid', link: '/women/oversized/solid' },
                 { name: 'Printed', link: '/women/oversized/printed' },
+              ],
+            },
+            {
+              name: 'Polo', link: '/women/polo',
+              subcategories: [
+                { name: 'Solid', link: '/women/polo/solid' },
+                { name: 'Printed', link: '/women/polo/printed' },
               ],
             },
           ],

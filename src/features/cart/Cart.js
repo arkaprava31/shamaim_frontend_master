@@ -202,11 +202,14 @@ export default function Cart() {
                                         <select value={item.qty} onChange={(e) => handleQtyChange(e, item._id)}
                                           className='outline-none text-sm text-gray-900'>
                                           {
-                                            qtyOptions.map(opt => {
-                                              return (
-                                                <option value={opt}>{opt}</option>
-                                              )
-                                            })
+                                            Array.from(
+                                              { length: item.productId.stock?.[0]?.[item.size] > 0 ? item.productId.stock?.[0]?.[item.size] : 0 },
+                                              (_, i) => i + 1
+                                            ).map((num) => (
+                                              <option key={num} value={num}>
+                                                {num}
+                                              </option>
+                                            ))
                                           }
                                         </select>
                                       </div>
@@ -279,11 +282,14 @@ export default function Cart() {
                                               value={item.quantity}
                                             >
                                               {
-                                                qtyOptions.map(opt => {
-                                                  return (
-                                                    <option value={opt}>{opt}</option>
-                                                  )
-                                                })
+                                                Array.from(
+                                                  { length: item.product.stock?.[0]?.[item.size] > 0 ? item.product.stock?.[0]?.[item.size] : 0 },
+                                                  (_, i) => i + 1
+                                                ).map((num) => (
+                                                  <option key={num} value={num}>
+                                                    {num}
+                                                  </option>
+                                                ))
                                               }
                                             </select>
                                           </div>

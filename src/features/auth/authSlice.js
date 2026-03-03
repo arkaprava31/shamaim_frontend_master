@@ -73,15 +73,23 @@ export const fetchAuthStatus = createAsyncThunk(
 
 export const insertGoogleEmail = createAsyncThunk(
   "loginDetails/insertGoogleEmail",
-  async ({ email }, { rejectWithValue }) => {
+  async ({ token }, { rejectWithValue }) => {
     try {
-      const responce = await axios.get(`${baseUrl}/auth/getEmail/?email=${email}`);
-      if(responce){
-        localStorage.setItem("id",responce?.data);
+      const response = await axios.post(
+        `${baseUrl}/auth/google`,
+        { token }
+      );
+
+      if (response.data.success) {
+        localStorage.setItem("id", response.data.user.id);
+        localStorage.setItem("firstName", response.data.user.name.split(" ")[0]);
       }
-      return responce;
+
+      return response.data.user;
     } catch (error) {
-      return rejectWithValue(error.message || "Something went wrong");
+      return rejectWithValue(
+        error.response?.data || "Google login failed"
+      );
     }
   }
 );
@@ -147,6 +155,18 @@ const loginSlice = createSlice({
         state.data = action.payload;
       })
       .addCase(fetchAuthStatus.rejected, (state, action) => {
+        state.status = "failed";
+        state.error = action.payload;
+      })
+      .addCase(insertGoogleEmail.pending, (state) => {
+        state.status = "loading";
+      })
+      .addCase(insertGoogleEmail.fulfilled, (state, action) => {
+        state.status = "succeeded";
+        state.loggedInUserToken = action.payload.id;
+        state.data = action.payload;   // contains email, name, profilePic
+      })
+      .addCase(insertGoogleEmail.rejected, (state, action) => {
         state.status = "failed";
         state.error = action.payload;
       });

@@ -25,6 +25,7 @@ import { IoMdCloseCircleOutline } from "react-icons/io";
 import { AppContext } from "../app/Context";
 import { FaRegEdit } from "react-icons/fa";
 import { IoMdRemoveCircleOutline } from "react-icons/io";
+import Modal from "../features/common/Modal";
 
 function Checkout() {
   // shipping order ship rocket
@@ -59,6 +60,11 @@ function Checkout() {
   const [isCouponApplied, setIsCouponApplied] = useState(false);
   const [amountBeforeCoupon, setAmountBeforeCoupon] = useState(null);
   const [activeCouponCode, setActiveCouponCode] = useState([]);
+
+  const [cnfDltPopUp, setCnfDltPopUp] = useState(false);
+  const [currentAddressIndex, setCurrentAddressIndex] = useState(null);
+
+  const [openModal, setOpenModal] = useState(null);
 
   const getActiveCouponCode = async () => {
     setLoader(true);
@@ -758,7 +764,7 @@ function Checkout() {
                             <li
                               key={index}
                               onClick={() => handleAddress({ target: { value: index } })}
-                              className={`w-full lg:max-w-[60%] relative cursor-pointer rounded-xl border p-4 transition-all
+                              className={`w-full lg:max-w-[70%] relative cursor-pointer rounded-xl border p-4 transition-all
                                   ${selectedAddressIndex === index
                                   ? "border-indigo-600 ring-2 ring-indigo-600 bg-indigo-50"
                                   : "border-gray-300 hover:border-indigo-400 hover:bg-gray-50"
@@ -806,7 +812,8 @@ function Checkout() {
                                   type="button"
                                   onClick={(e) => {
                                     e.stopPropagation();
-                                    handleRemoveAddress(index);
+                                    setCnfDltPopUp(true);
+                                    setCurrentAddressIndex(index);
                                   }}
                                   className="font-medium text-red-600 hover:underline text-xl"
                                 >
@@ -818,6 +825,38 @@ function Checkout() {
                         </div>
                   }
                 </ul>
+
+                {cnfDltPopUp && (
+                  <div className="fixed inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center z-50 px-4">
+                    <div className="bg-white w-full max-w-xl rounded-2xl p-6 shadow-xl flex flex-col">
+                      <h2 className="text-base font-bold text-gray-900 mb-1">
+                        Confirm Delete Address
+                      </h2>
+                      <p className="text-gray-700">
+                        Are you sure you want to delete this address?
+                      </p>
+                      <div className="flex justify-end gap-3 mt-4">
+                        <button
+                          onClick={() => setCnfDltPopUp(false)}
+                          className="px-5 py-2 rounded-md border border-gray-300
+                           text-gray-600 hover:bg-gray-100 transition"
+                        >
+                          Cancel
+                        </button>
+                        <button
+                          onClick={() => {
+                            handleRemoveAddress(currentAddressIndex);
+                            setCnfDltPopUp(false);
+                          }}
+                          className="px-6 py-2 rounded-md bg-red-600
+                           text-white hover:bg-red-700 transition"
+                        >
+                          Delete
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                )}
 
                 {/* button add address */}
 
@@ -940,7 +979,7 @@ function Checkout() {
                               {...register("phone", {
                                 required: "Phone number is required",
                                 pattern: {
-                                  value: /^[6-9]\d{9}$/,
+                                  value: /^[4-9]\d{9}$/,
                                   message: "Enter a valid 10-digit mobile number",
                                 },
                               })}
@@ -1227,11 +1266,14 @@ function Checkout() {
                                         <select value={item.qty} onChange={(e) => handleQtyChange(e, item._id)}
                                           className='outline-none border-none py-1 cursor-pointer'>
                                           {
-                                            qtyOptions.map(opt => {
-                                              return (
-                                                <option value={opt}>{opt}</option>
-                                              )
-                                            })
+                                            Array.from(
+                                              { length: item.productId.stock?.[0]?.[item.size] > 0 ? item.productId.stock?.[0]?.[item.size] : 0 },
+                                              (_, i) => i + 1
+                                            ).map((num) => (
+                                              <option key={num} value={num}>
+                                                {num}
+                                              </option>
+                                            ))
                                           }
                                         </select>
                                       </div>
@@ -1241,7 +1283,17 @@ function Checkout() {
                                   <div className='flex flex-col items-end justify-between gap-10'>
                                     <div className='font-medium'>{INR.format(item.qty * item.price)}</div>
 
-                                    <div onClick={(e) => handleRemove(e, item._id)}
+                                    <Modal
+                                      title={`Delete ${item.productId.title}`}
+                                      message="Are you sure you want to delete this Cart item ?"
+                                      dangerOption="Delete"
+                                      cancelOption="Cancel"
+                                      dangerAction={(e) => handleRemove(e, item._id)}
+                                      cancelAction={() => setOpenModal(null)}
+                                      showModal={openModal === item._id}
+                                    ></Modal>
+
+                                    <div onClick={() => setOpenModal(item._id)}
                                       className='text-sm text-indigo-600 hover:text-indigo-500 font-semibold cursor-pointer'>Remove</div>
                                   </div>
                                 </div>
@@ -1270,11 +1322,14 @@ function Checkout() {
                                         <select onChange={(e) => handleQuantity(e, item)} value={item.quantity}
                                           className='outline-none border-none py-1 cursor-pointer'>
                                           {
-                                            qtyOptions.map(opt => {
-                                              return (
-                                                <option value={opt}>{opt}</option>
-                                              )
-                                            })
+                                            Array.from(
+                                              { length: item.product.stock?.[0]?.[item.size] > 0 ? item.product.stock?.[0]?.[item.size] : 0 },
+                                              (_, i) => i + 1
+                                            ).map((num) => (
+                                              <option key={num} value={num}>
+                                                {num}
+                                              </option>
+                                            ))
                                           }
                                         </select>
                                       </div>
@@ -1286,7 +1341,20 @@ function Checkout() {
                                       {INR.format(Math.floor(item.quantity * (item.product.price - item.product.price * (item.product.discountPercentage / 100))))}
                                     </div>
 
-                                    <div onClick={(e) => handleRemove(e, item.id)}
+                                    <Modal
+                                      title={`Delete ${item.product.title}`}
+                                      message="Are you sure you want to delete this Cart item ?"
+                                      dangerOption="Delete"
+                                      cancelOption="Cancel"
+                                      dangerAction={(e) => handleRemove(e, item.id)}
+                                      cancelAction={() => setOpenModal(null)}
+                                      showModal={openModal === item.id}
+                                    ></Modal>
+
+                                    <div
+                                      onClick={() => {
+                                        setOpenModal(item.id);
+                                      }}
                                       className='text-sm text-indigo-600 hover:text-indigo-500 font-semibold cursor-pointer'>Remove</div>
                                   </div>
                                 </div>

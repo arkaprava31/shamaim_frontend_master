@@ -13,6 +13,10 @@ function Logout() {
     };
     getsignOut();
 
+    localStorage.clear();
+    sessionStorage.clear();
+    
+    window.location.reload();
   }, [dispatch]);
 
   return (

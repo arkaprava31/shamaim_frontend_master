@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 import { IoCubeOutline, IoLocationOutline } from "react-icons/io5";
 import { PiHeadset } from "react-icons/pi";
@@ -30,6 +30,14 @@ const actions = [
 export const UserProfile = () => {
   const user = useSelector(selectUserInfo);
 
+  const [firstName, setFirstName] = useState("");
+
+  useEffect(() => {
+    if (localStorage.getItem("firstName")) {
+      setFirstName(localStorage.getItem("firstName"));
+    }
+  }, []);
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-100 to-gray-200 font-poppins">
 
@@ -39,14 +47,14 @@ export const UserProfile = () => {
 
         <div className="relative z-10 flex flex-col items-center text-white">
           <div className="flex h-20 w-20 items-center justify-center rounded-full bg-white/20 text-3xl font-semibold backdrop-blur">
-            {user?.name?.[0] || "U"}
+            {firstName?.[0] || "U"}
           </div>
 
           <h1 className="mt-4 text-2xl font-semibold">
-            {user?.name || "User"}
+            {firstName || "User"}
           </h1>
 
-          <p className="text-base opacity-90">Welcome back 👋</p>
+          <p className="text-sm opacity-90 mt-2">Welcome back 👋</p>
         </div>
       </div>
 

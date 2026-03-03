@@ -1,4 +1,4 @@
-import { Link, useLocation } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import { VscAccount } from "react-icons/vsc";
 import { useSelector } from "react-redux";
 import { selectItems } from "../cart/cartSlice";
@@ -11,6 +11,7 @@ import { useContext, useEffect, useState } from "react";
 import Sidebar from "./Sidebar";
 import { getId } from "../../app/constants";
 import { AppContext } from "../../app/Context";
+import { get } from "react-hook-form";
 
 function NavBar({ children }) {
   const items = useSelector(selectItems);
@@ -18,6 +19,8 @@ function NavBar({ children }) {
   const location = useLocation();
   const [user, setUser] = useState("");
   const dispatch = useDispatch();
+
+  const navigate = useNavigate();
 
   const {
     totalItems,
@@ -86,12 +89,10 @@ function NavBar({ children }) {
                 </div>
               ) : (
                 <div className="cursor-pointer">
-                  <Link to={"/"}>
-                    <img
-                      src="https://images.bewakoof.com/web/ic-web-head-primary-back.svg"
-                      alt="back"
-                    />
-                  </Link>
+                  <img onClick={() => navigate(-1)}
+                    src="https://images.bewakoof.com/web/ic-web-head-primary-back.svg"
+                    alt="back"
+                  />
                 </div>
               )}
             </div>
@@ -145,7 +146,7 @@ function NavBar({ children }) {
             >
               <FaOpencart size={20} className="relative" />
               <span className="absolute top-3 text-xs ml-2 px-1 bg-orange-700 rounded-full text-white">
-                {totalItems}
+                {getId() ? items.length : totalItems}
               </span>
             </Link>
             <Link to={"/account"} className="flex items-center cursor-pointer">

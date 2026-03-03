@@ -1,54 +1,105 @@
 import React, { useEffect, useState } from 'react';
 import { useDispatch } from 'react-redux';
-import { fetchLoggedInUserOrderAsync, fetchproductorderbyidAsync } from '../userSlice';
+import {
+  fetchLoggedInUserOrderAsync,
+} from '../userSlice';
 import { GrNext } from "react-icons/gr";
 import { Link } from 'react-router-dom';
-
 
 export default function UserOrders() {
   const dispatch = useDispatch();
   const [orders, setOrders] = useState([]);
 
   useEffect(() => {
-    fetchdata();
+    fetchData();
   }, []);
 
-  const fetchdata = async () => {
-    let res = await dispatch(fetchLoggedInUserOrderAsync()).unwrap();
+  const fetchData = async () => {
+    const res = await dispatch(fetchLoggedInUserOrderAsync()).unwrap();
     setOrders(res);
-  }
-
-  const handlemore = async (orderid) => {
-    const data = await dispatch(fetchproductorderbyidAsync(orderid)).unwrap();
-  }
+  };
 
   const formatDate = (createdAt) => {
-    let date = new Date(createdAt);
-    return date.toLocaleDateString('en-US', { day: '2-digit', month: 'short' });
-  }
+    const date = new Date(createdAt);
+    return date.toLocaleDateString('en-IN', {
+      day: '2-digit',
+      month: 'short',
+      year: 'numeric',
+    });
+  };
 
   return (
-    <div className='mt-10'>
-      <div className='bg-white shadow rounded-t-lg w-full h-12 mb-3'>
-        <p className='text-center py-2'>My Orders</p>
+    <div className="min-h-screen bg-gradient-to-b from-indigo-50 via-white to-white px-4 py-6 sm:px-6 lg:px-8">
+      
+      {/* Header */}
+      <div className="mb-6 mt-6 lg:mt-0">
+        <h1 className="text-4xl font-semibold text-gray-900">My Orders</h1>
+        <p className="text-base text-indigo-600 mt-1">
+          Your recent purchases & order history
+        </p>
       </div>
-      {orders ? orders.map((order) => (
 
-        <Link to={`/orders-details/${order.id}`} key={order.id} className="order-card  mb-0.5 bg-white rounded-lg  flex items-center justify-between py-8 p-2 text-sm sm:text-lg">
-          <img src={order.items[0].thumbnail} alt={order.items[0].name} className="order-image w-16 h-16 rounded-md " />
-          <div className="order-details flex-1 pl-4 ">
-            <p className="order-date text-gray-600">Order On {formatDate(order.createdAt)}</p>
-            <p className="order-id text-gray-8  font-semibold">Order ID: {order.id}</p>
-            <div className="order-item">
-              <p className="order-item-name text-gray-800">{(order.items[0].name).slice(0,40).concat('...')}</p>
-            </div>
-            <div className=' text-gray-700 shadow-2xl bg-red-800 w-1'>
-            <hr/>
-            </div>
-          </div>
-          <GrNext  size={16}/>
-        </Link>
-      )):<p className=' text-lg font-semibold text-red-800'>Continue Shoping</p>}
+      {/* Orders */}
+      {orders && orders.length > 0 ? (
+        <div className="flex flex-col gap-4">
+          {orders.map((order) => (
+            <Link
+              to={`/orders-details/${order.id}`}
+              key={order.id}
+              className="group bg-white rounded-2xl border border-indigo-100 p-4 sm:p-5 flex items-center gap-4
+                         hover:shadow-lg hover:border-indigo-300 transition-all duration-200"
+            >
+              {/* Image */}
+              <div className="relative flex-shrink-0">
+                <img
+                  src={order.items[0].thumbnail}
+                  alt={order.items[0].name}
+                  className="w-16 h-16 sm:w-20 sm:h-20 rounded-xl object-cover border border-gray-200"
+                />
+                {/* Status Dot (placeholder) */}
+                <span className="absolute -bottom-1 -right-1 w-3 h-3 rounded-full bg-green-500 ring-2 ring-white" />
+              </div>
+
+              {/* Order Info */}
+              <div className="flex-1 min-w-0">
+                <p className="text-xs sm:text-sm text-gray-500">
+                  Ordered on {formatDate(order.createdAt)}
+                </p>
+
+                <p className="mt-1 text-sm sm:text-base font-semibold text-indigo-700 truncate">
+                  Order #{order.id}
+                </p>
+
+                <p className="mt-1 text-sm text-gray-700 line-clamp-2">
+                  {order.items[0].name}
+                </p>
+              </div>
+
+              {/* Arrow */}
+              <div className="flex items-center text-indigo-400 group-hover:text-indigo-600 transition">
+                <GrNext size={18} />
+              </div>
+            </Link>
+          ))}
+        </div>
+      ) : (
+        <div className="bg-white rounded-2xl border border-indigo-100 p-10 text-center shadow-sm">
+          <p className="text-gray-700 text-lg font-medium">
+            No orders yet
+          </p>
+          <p className="text-sm text-gray-500 mt-1">
+            Looks like you haven’t placed any orders
+          </p>
+
+          <Link
+            to="/"
+            className="inline-block mt-5 rounded-full bg-gradient-to-r from-indigo-600 to-purple-600
+                       px-6 py-2.5 text-sm font-semibold text-white hover:opacity-90"
+          >
+            Start Shopping
+          </Link>
+        </div>
+      )}
     </div>
   );
 }

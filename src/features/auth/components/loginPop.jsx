@@ -28,7 +28,8 @@ export const LoginPopUp = () => {
                 Join us now to be a part of the Shamaim family.
               </p>
             </div>
-            <div className="flex flex-col gap-4 mt-4">
+
+            {/* <div className="flex flex-col gap-4 mt-4">
               <input
                 type="email"
                 value={email}
@@ -42,8 +43,10 @@ export const LoginPopUp = () => {
               >
                 CONTINUE
               </button>
-            </div>
-            <p className="text-center text-gray-500">or</p>
+            </div> */}
+
+            {/* <p className="text-center text-gray-500">or</p> */}
+
             <div className="flex justify-center">
               <GoogleLoginButton />
             </div>
