@@ -1,106 +1,145 @@
-import React, { useEffect, useState, useRef, useCallback } from "react";
+import { useState, useEffect, useRef } from "react";
 import { fetchProductsWomenOversizedAsync } from "../productSlice";
 import { useDispatch } from "react-redux";
-import { Link } from "react-router-dom";
+import { Link, useParams } from "react-router-dom";
 
 export default function WomenOversized() {
-  const [menData, setMenData] = useState([]);
-  const [error, setError] = useState(null);
+  const [products, setProducts] = useState([]);
   const [page, setPage] = useState(1);
   const [loading, setLoading] = useState(false);
-  const [totalitem, setTotalItem] = useState(0);
-  const dispatch = useDispatch();
+  const [hasMore, setHasMore] = useState(true);
+
   const loader = useRef(null);
+  const dispatch = useDispatch();
+  const { pattern } = useParams();
 
-  const getDetails = useCallback(async () => {
+  const fetchProducts = async () => {
+    if (loading || !hasMore) return;
+
     setLoading(true);
+
     try {
-      if (menData.length <= totalitem) {
-        const data = await dispatch(
-          fetchProductsWomenOversizedAsync({ page })
-        ).unwrap();
-        setMenData((prevData) => [...prevData, ...data?.products.docs]);
-        setTotalItem(data?.products?.totalDocs);
+      const res = await dispatch(
+        fetchProductsWomenOversizedAsync({ page })
+      ).unwrap();
+
+      let newProducts = res.products.docs;
+
+      if (pattern === "solid") {
+        newProducts = newProducts.filter(
+          (p) => p.genre?.length === 0
+        );
       }
+
+      if (newProducts.length === 0) {
+        setHasMore(false);
+      }
+
+      setProducts((prev) => [...prev, ...newProducts]);
     } catch (err) {
-      setError("Error while fetching the data");
-    } finally {
-      setLoading(false);
-    }
-  }, [dispatch, page]);
-
-  useEffect(() => {
-    getDetails();
-  }, [getDetails]);
-
-  const handleObserver = useCallback(
-    (entries) => {
-      const target = entries[0];
-      if (target.isIntersecting && !loading) {
-        setPage((prev) => prev + 1);
-      }
-    },
-    [loading]
-  );
-
-  useEffect(() => {
-    const observer = new IntersectionObserver(handleObserver, {
-      root: null,
-      rootMargin: "20px",
-      threshold: 1.0,
-    });
-
-    if (loader.current) {
-      observer.observe(loader.current);
+      console.error(err);
     }
 
-    return () => {
-      if (loader.current) {
-        observer.unobserve(loader.current);
-      }
-    };
-  }, [handleObserver]);
+    setLoading(false);
+  };
+
+  useEffect(() => {
+    fetchProducts();
+  }, [page]);
+
+  useEffect(() => {
+    setProducts([]);
+    setPage(1);
+    setHasMore(true);
+  }, [pattern]);
+
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (entries[0].isIntersecting && !loading && hasMore) {
+          setPage((prev) => prev + 1);
+        }
+      },
+      { rootMargin: "200px" }
+    );
+
+    if (loader.current) observer.observe(loader.current);
+
+    return () => observer.disconnect();
+  }, [loading, hasMore]);
 
   return (
     <>
-      <div className="h-[100%]">
-        <img src="https://firebasestorage.googleapis.com/v0/b/shamaim-lifestyle.appspot.com/o/Category%20wallpepar%2FWomen%20oversized.png?alt=media&token=aebc87ba-ec34-4f36-b43c-cff7ab47cc55" />
+      <div className="h-full">
+        <img
+          src="https://firebasestorage.googleapis.com/v0/b/shamaim-lifestyle.appspot.com/o/Category%20wallpepar%2FWomen%20oversized.png?alt=media&token=aebc87ba-ec34-4f36-b43c-cff7ab47cc55"
+          alt="Women Oversized"
+        />
       </div>
-      {error && <p className="text-center text-red-500">{error}</p>}
-      <div className=" w-[100%] h-[100%] flex  justify-center item center ">
-        <div className="grid grid-cols-2 gap-4 p-4 sm:grid-cols-4 w-[100%] md:w-[70%] md:h-[100%] text-xs md:justify-end   font-popins bg-white md:px-10 md:text-lg">
-          {menData?.map((product) => (
-            <Link to={`/product-detail/${product.id}`} key={product.id}>
-              <img
-                src={product.thumbnail}
-                alt={product.title}
-                className="object-cover w-full h-48 mb-4 md:h-[50vh]"
-              />
-              <p className="">Shamaim</p>
-              <p className="text-gray-600 ">
-                {product.AboutTheDesign.slice(0, 38).concat("...")}
-              </p>
-              <div className="flex">
-                <p className="">
-                  ₹
-                  {Math.floor(
-                    product.price -
-                      product.price * (product.discountPercentage / 100)
-                  )}
-                </p>
-                <p className="px-1  text-gray-700 line-through text-[#737373]">
-                  ₹{product.price}
-                </p>
-              </div>
-              <div className="w-20 h-5 md:h-8 md:w-28 text-center text-[#737373] border border-[#737373] border-1">
-                <p>100% cotton</p>
-              </div>
-            </Link>
-          ))}
-        </div>
+
+      <div className="w-full flex justify-center mt-6">
+        {products.length === 0 ? (
+          <div className="w-full text-center text-sm text-gray-700">
+            No products found.
+          </div>
+        ) : (
+          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-5 md:gap-8 p-4 w-full md:w-[80%] font-poppins">
+            {products.map((product) => {
+              const discountedPrice = Math.floor(
+                product.price -
+                  product.price * (product.discountPercentage / 100)
+              );
+
+              return (
+                <Link
+                  to={`/product-detail/${product.id}`}
+                  key={product.id}
+                  className="group bg-white rounded-2xl border border-gray-100 overflow-hidden 
+                  hover:shadow-xl hover:-translate-y-1 transition-all duration-300"
+                >
+                  <div className="relative overflow-hidden">
+                    <img
+                      src={product.thumbnail}
+                      alt={product.title}
+                      className="w-full h-52 md:h-64 object-cover group-hover:scale-105 transition duration-300"
+                    />
+
+                    {product.discountPercentage > 0 && (
+                      <span className="absolute top-3 left-3 bg-red-500 text-white text-xs px-2 py-1 rounded-md">
+                        {Math.round(product.discountPercentage)}% OFF
+                      </span>
+                    )}
+                  </div>
+
+                  <div className="p-3 flex flex-col gap-1">
+                    <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide">
+                      Shamaim
+                    </p>
+
+                    <p className="text-sm text-gray-700 font-medium line-clamp-2">
+                      {product.AboutTheDesign?.slice(0, 45)}...
+                    </p>
+
+                    <div className="flex items-center gap-2 mt-1">
+                      <p className="text-sm font-semibold text-gray-900">
+                        ₹{discountedPrice}
+                      </p>
+
+                      <p className="text-xs text-gray-400 line-through">
+                        ₹{product.price}
+                      </p>
+                    </div>
+                  </div>
+                </Link>
+              );
+            })}
+          </div>
+        )}
       </div>
-      {loading && <p className="text-center">Loading...</p>}
-      <div ref={loader} />
+
+      {loading && <p className="text-center py-4">Loading...</p>}
+
+      <div ref={loader} className="h-10"></div>
     </>
   );
 }

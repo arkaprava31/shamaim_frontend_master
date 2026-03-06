@@ -1,108 +1,149 @@
-import { useState, useEffect, useCallback, useRef } from 'react';
-import { fetchCategoryProductAsync } from '../productSlice';
-import { useDispatch, useSelector } from 'react-redux';
-import { Link } from 'react-router-dom';
+import { useState, useEffect, useRef } from "react";
+import { fetchCategoryProductAsync } from "../productSlice";
+import { useDispatch } from "react-redux";
+import { Link, useParams } from "react-router-dom";
 
 export default function MenHoddiesCreackneak() {
-  const [data, setData] = useState([]);
-  const [totalpage, setTotalpages] = useState();
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState(null);
+  const [products, setProducts] = useState([]);
   const [page, setPage] = useState(1);
+  const [loading, setLoading] = useState(false);
+  const [hasMore, setHasMore] = useState(true);
+
   const loader = useRef(null);
-  let subcategories="Classic Fit";
-  let gender="Male"
-
   const dispatch = useDispatch();
+  const { pattern } = useParams();
 
-  const getDeatils = useCallback(async () => {
-    if (loading || page > totalpage) return; 
+  const subcategories = "Classic Fit";
+  const gender = "Male";
+
+  const fetchProducts = async () => {
+    if (loading || !hasMore) return;
 
     setLoading(true);
+
     try {
-      let result = await dispatch(fetchCategoryProductAsync({ page,subcategories,gender })).unwrap();
-      setData((prevData) => [...prevData, ...result.products.docs]);
-      setTotalpages(result?.totalItems);
+      const res = await dispatch(
+        fetchCategoryProductAsync({ page, subcategories, gender })
+      ).unwrap();
+
+      let newProducts = res.products.docs;
+
+      if (pattern === "solid") {
+        newProducts = newProducts.filter(
+          (p) => p.genre?.length === 0
+        );
+      }
+
+      if (newProducts.length === 0) {
+        setHasMore(false);
+      }
+
+      setProducts((prev) => [...prev, ...newProducts]);
     } catch (err) {
-      setError('Error fetching data');
-    } finally {
-      setLoading(false);
-    }
-  }, [dispatch, page, loading, totalpage]);
-
-  useEffect(() => {
-    getDeatils();
-  }, [getDeatils]);
-
-  const handleObserver = useCallback(
-    (entries) => {
-      const target = entries[0];
-      if (target.isIntersecting && !loading && page <= totalpage) {
-        setPage((prev) => prev + 1); // Only increment if not loading
-      }
-    },
-    [loading, page, totalpage]
-  );
-
-  useEffect(() => {
-    const observer = new IntersectionObserver(handleObserver, {
-      root: null,
-      rootMargin: '20px',
-      threshold: 1.0,
-    });
-
-    if (loader.current) {
-      observer.observe(loader.current);
+      console.error("Error fetching data", err);
     }
 
-    return () => {
-      if (loader.current) {
-        observer.unobserve(loader.current);
-      }
-    };
-  }, [handleObserver]);
+    setLoading(false);
+  };
+
+  useEffect(() => {
+    fetchProducts();
+  }, [page]);
+
+  useEffect(() => {
+    setProducts([]);
+    setPage(1);
+    setHasMore(true);
+  }, [pattern]);
+
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (entries[0].isIntersecting && !loading && hasMore) {
+          setPage((prev) => prev + 1);
+        }
+      },
+      { rootMargin: "200px" }
+    );
+
+    if (loader.current) observer.observe(loader.current);
+
+    return () => observer.disconnect();
+  }, [loading, hasMore]);
 
   return (
     <>
-      <div className="h-[100%]">
+      <div className="w-full">
         <img
           src="https://firebasestorage.googleapis.com/v0/b/shamaim-lifestyle.appspot.com/o/Category%20wallpepar%2Fmen%20crewneck.jpg?alt=media&token=1b96b61c-601d-4da0-9ead-afc351c26952"
+          alt="Men Crewneck"
+          className="w-full object-cover"
         />
       </div>
-      {error && <p className="text-center text-red-500">{error}</p>}
-      <div className="w-[100%] h-[100%] flex justify-center item center">
-        <div className="grid grid-cols-2 gap-4 md:gap-8 p-3 sm:grid-cols-4 w-[100%] md:w-[70%] md:h-[100%] text-xs md:justify-end font-poppins md:px-10 md:text-lg">
-          {data?.map((product) => (
-            <Link to={`/product-detail/${product.id}`} key={product.id}>
-              <img
-                src={product.thumbnail}
-                alt={product.title}
-                className="object-cover w-full h-56 mb-4 md:h-[55vh]"
-              />
-              <div className="flex flex-col px-3 justify-between h-[12vh]">
-                <p className="text-[#4f5362] text-[10px] font-semibold font-sans">Shamaim</p>
-                <p className="text-[#737373] text-[8px] font-serif">
-                  {product.AboutTheDesign.slice(0, 30).concat('...')}
-                </p>
-                <div className="flex">
-                  <p className="text-xs">
-                    ₹{Math.floor(product.price - product.price * (product.discountPercentage / 100))}
-                  </p>
-                  <p className="px-1.5 text-[#949494] text-sm font-light font-serif line-through ">
-                    ₹{product.price}
-                  </p>
-                </div>
-                <div className="w-[90%] text-[7px] font-semibold py-0.5 text-center text-[#737373] border border-[#737373] border-1">
-                  <p>LIGHTWEIGHT TERRY FABRIC</p>
-                </div>
-              </div>
-            </Link>
-          ))}
-        </div>
+
+      <div className="w-full flex justify-center mt-6">
+        {products.length === 0 ? (
+          <div className="w-full text-center text-sm text-gray-700">
+            No products found.
+          </div>
+        ) : (
+          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-5 md:gap-8 p-4 w-full md:w-[80%] font-poppins">
+            {products.map((product) => {
+              const discountedPrice = Math.floor(
+                product.price -
+                product.price * (product.discountPercentage / 100)
+              );
+
+              return (
+                <Link
+                  to={`/product-detail/${product.id}`}
+                  key={product.id}
+                  className="group bg-white rounded-2xl border border-gray-100 overflow-hidden 
+                  hover:shadow-xl hover:-translate-y-1 transition-all duration-300"
+                >
+                  <div className="relative overflow-hidden">
+                    <img
+                      src={product.thumbnail}
+                      alt={product.title}
+                      className="w-full h-52 md:h-64 object-cover group-hover:scale-105 transition duration-300"
+                    />
+
+                    {product.discountPercentage > 0 && (
+                      <span className="absolute top-3 left-3 bg-red-500 text-white text-xs px-2 py-1 rounded-md">
+                        {Math.round(product.discountPercentage)}% OFF
+                      </span>
+                    )}
+                  </div>
+
+                  <div className="p-3 flex flex-col gap-1">
+                    <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide">
+                      Shamaim
+                    </p>
+
+                    <p className="text-sm text-gray-700 font-medium line-clamp-2">
+                      {product.AboutTheDesign?.slice(0, 45)}...
+                    </p>
+
+                    <div className="flex items-center gap-2 mt-1">
+                      <p className="text-sm font-semibold text-gray-900">
+                        ₹{discountedPrice}
+                      </p>
+
+                      <p className="text-xs text-gray-400 line-through">
+                        ₹{product.price}
+                      </p>
+                    </div>
+                  </div>
+                </Link>
+              );
+            })}
+          </div>
+        )}
       </div>
 
-      {loading && <p className="text-center">Loading...</p>}
-      <div ref={loader} />
+      {loading && <p className="text-center py-4">Loading...</p>}
+
+      <div ref={loader} className="h-10"></div>
     </>
   );
 }
