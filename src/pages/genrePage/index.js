@@ -1,17 +1,22 @@
 import { useParams, Link } from "react-router-dom";
-import { useState, useEffect, useRef, useCallback } from "react";
-import { baseUrl } from "../../app/constants";
+import { useState, useEffect, useRef } from "react";
 import axios from "axios";
+import { baseUrl } from "../../app/constants";
 
 export const Genrepage = () => {
-  const params = useParams();
-  const observerRef = useRef();
-  const [generData, setGenerData] = useState([]);
-  const [loading, setLoading] = useState(false);
-  const [page, setPage] = useState(1);
-  const [leftItems, setLeftItems] = useState(1);
+  const { name } = useParams();
 
-  let generUi = [
+  const [products, setProducts] = useState([]);
+  const [loadedImages, setLoadedImages] = useState({});
+  const [page, setPage] = useState(1);
+  const [loading, setLoading] = useState(false);
+  const [initialLoading, setInitialLoading] = useState(true);
+  const [hasMore, setHasMore] = useState(true);
+  const [bannerLoading, setBannerLoading] = useState(true);
+
+  const loader = useRef(null);
+
+  const generUi = [
     {
       name: "Abstract",
       url: "https://firebasestorage.googleapis.com/v0/b/shamaim-lifestyle.appspot.com/o/Homejonnerbox%2FModern%20abstract.png?alt=media&token=6343626f-1745-4135-8e79-238bd9a3ede1",
@@ -46,130 +51,208 @@ export const Genrepage = () => {
     },
   ];
 
-  generUi = generUi.filter((item) => item.name == params?.name);
-
-
-
-  const headers = { "content-type": "application/json" };
-
-  const getGenerProducts = async () => {
-    if (leftItems > 0) {
-      try {
-        const response = await axios.get(
-          `${baseUrl}/products?genre=${params?.name}&pages=${page}`,
-          { headers }
-        );
-        if (response?.data?.docs?.length > 0) {
-          setGenerData((prev) => [...prev, ...response.data.docs]);
-          setLeftItems(response.data.totalleft || 0); // Set to 0 if undefined
-        } else {
-          setLeftItems(0); // No more items
-        }
-      } catch (error) {
-        console.error("Error fetching products:", error);
-      }
-    }
-  };
-  
+  const banner = generUi.find((g) => g.name === name);
 
   useEffect(() => {
-    getGenerProducts();
+    window.scrollTo(0, 0);
+  }, []);
+
+  const fetchProducts = async () => {
+    if (loading || !hasMore) return;
+
+    setLoading(true);
+
+    try {
+      const response = await axios.get(
+        `${baseUrl}/products?genre=${name}&pages=${page}`
+      );
+
+      const newProducts = response?.data?.docs || [];
+
+      if (newProducts.length === 0) {
+        setHasMore(false);
+      }
+
+      setProducts((prev) => [...prev, ...newProducts]);
+    } catch (error) {
+      console.error("Error fetching products:", error);
+    }
+
+    setLoading(false);
+    setInitialLoading(false);
+  };
+
+  useEffect(() => {
+    fetchProducts();
   }, [page]);
 
-  const handleObserver = useCallback(
-    (entries) => {
-      const target = entries[0];
-      if (target.isIntersecting && !loading) {
-        setPage((prevPage) => prevPage + 1);
-      }
-    },
-    [loading]
-  );
-
+  // reset when genre changes
   useEffect(() => {
-    const observer = new IntersectionObserver(handleObserver, {
-      root: null,
-      rootMargin: "20px",
-      threshold: 1.0,
-    });
+    setProducts([]);
+    setLoadedImages({});
+    setPage(1);
+    setHasMore(true);
+    setInitialLoading(true);
+    setBannerLoading(true);
+  }, [name]);
 
-    if (observerRef.current) observer.observe(observerRef.current);
-    return () => {
-      if (observerRef.current) observer.unobserve(observerRef.current);
-    };
-  }, [handleObserver]);
+  // infinite scroll
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (entries[0].isIntersecting && !loading && hasMore) {
+          setPage((prev) => prev + 1);
+        }
+      },
+      { rootMargin: "200px" }
+    );
+
+    if (loader.current) observer.observe(loader.current);
+
+    return () => observer.disconnect();
+  }, [loading, hasMore]);
+
+  const handleImageLoad = (id) => {
+    setLoadedImages((prev) => ({ ...prev, [id]: true }));
+  };
 
   return (
-    <div className="w-full h-[80vh] px-4">
-      {generUi.map((item) => (
-        <div key={item.name} className="w-full mt-2 md:mt-5  mb-4 ">
+    <div className="w-full">
+
+      {/* Banner */}
+      {banner && (
+        <div className="w-full relative">
+          {bannerLoading && (
+            <div className="w-full h-[200px] md:h-[350px] bg-gray-200 animate-pulse flex items-center justify-center">
+              <p className="text-gray-500 text-sm">Loading banner...</p>
+            </div>
+          )}
+
           <img
-            src={item.url}
-            alt={item.name}
-            className="w-[100vw]  object-cover rounded-lg"
+            src={banner.url}
+            alt={banner.name}
+            onLoad={() => setBannerLoading(false)}
+            className={`w-full object-cover ${bannerLoading ? "hidden" : "block"
+              }`}
           />
         </div>
-      ))}
+      )}
 
-      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
-        {generData.length > 0 ? (
-          generData.map((product) => (
-            <Link to={`/product-detail/${product.id}`} key={product.id}>
-              <div className="group relative border border-gray-200 p-3 rounded-lg shadow hover:shadow-lg transition-shadow duration-300">
-                <div className="aspect-w-1 aspect-h-1 w-full overflow-hidden rounded-md bg-gray-100 group-hover:opacity-90">
-                  <img
-                    src={product.thumbnail}
-                    alt={product.title}
-                    className="h-full w-full object-cover"
-                  />
+      {(initialLoading || products.length !== 0) && (
+        <div className="w-full flex justify-center mt-6">
+          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-5 md:gap-8 p-4 w-full md:w-[80%] font-poppins">
+
+            {/* Initial Skeletons */}
+            {initialLoading &&
+              [...Array(8)].map((_, i) => (
+                <div
+                  key={i}
+                  className="bg-white rounded-2xl border border-gray-100 overflow-hidden"
+                >
+                  <div className="w-full h-52 md:h-64 bg-gray-200 animate-pulse"></div>
+
+                  <div className="p-3 space-y-2">
+                    <div className="h-3 bg-gray-200 rounded animate-pulse w-16"></div>
+                    <div className="h-4 bg-gray-200 rounded animate-pulse w-full"></div>
+                    <div className="h-4 bg-gray-200 rounded animate-pulse w-24"></div>
+                  </div>
                 </div>
-                <div className="mt-4 flex justify-between items-center">
-                  <div>
-                    <h3 className="text-sm font-semibold text-gray-800">
-                      {product.title}
-                    </h3>
-                    <p className="text-xs text-gray-500">
-                      Discount:{" "}
-                      <span className="text-green-600 font-medium">
-                        {product.discountPercentage}% off
+              ))}
+
+            {/* Product Cards */}
+            {products.map((product) => {
+              const discountedPrice = Math.floor(
+                product.price -
+                product.price * (product.discountPercentage / 100)
+              );
+
+              return (
+                <Link
+                  to={`/product-detail/${product.id}`}
+                  key={product.id}
+                  className="group bg-white rounded-2xl border border-gray-100 overflow-hidden 
+                hover:shadow-xl hover:-translate-y-1 transition-all duration-300"
+                >
+                  <div className="relative overflow-hidden">
+
+                    {!loadedImages[product.id] && (
+                      <div className="absolute inset-0 bg-gray-200 animate-pulse"></div>
+                    )}
+
+                    <img
+                      src={product.thumbnail}
+                      alt={product.title}
+                      loading="lazy"
+                      onLoad={() => handleImageLoad(product.id)}
+                      className={`w-full h-52 md:h-64 object-cover group-hover:scale-105 transition duration-300 ${loadedImages[product.id] ? "opacity-100" : "opacity-0"
+                        }`}
+                    />
+
+                    {product.discountPercentage > 0 && (
+                      <span className="absolute top-3 left-3 bg-red-500 text-white text-xs px-2 py-1 rounded-md">
+                        {Math.round(product.discountPercentage)}% OFF
                       </span>
-                    </p>
+                    )}
                   </div>
-                  <div className="text-right">
-                    <p className="text-sm font-bold text-gray-900">
-                      ₹
-                      {Math.floor(
-                        product.price -
-                          product.price * (product.discountPercentage / 100)
-                      )}
+
+                  <div className="p-3 flex flex-col gap-1">
+                    <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide">
+                      Shamaim
                     </p>
-                    <p className="text-xs line-through text-gray-400">
-                      ₹{product.price}
+
+                    <p className="text-sm text-gray-700 font-medium line-clamp-2">
+                      {product.title}
                     </p>
+
+                    <div className="flex items-center gap-2 mt-1">
+                      <p className="text-sm font-semibold text-gray-900">
+                        ₹{discountedPrice}
+                      </p>
+
+                      <p className="text-xs text-gray-400 line-through">
+                        ₹{product.price}
+                      </p>
+                    </div>
+
+                    {product.stock <= 0 && (
+                      <p className="text-xs text-red-500">Coming Soon</p>
+                    )}
+                  </div>
+                </Link>
+              );
+            })}
+
+            {/* Infinite Scroll Skeletons */}
+            {loading &&
+              [...Array(4)].map((_, i) => (
+                <div
+                  key={"loading" + i}
+                  className="bg-white rounded-2xl border border-gray-100 overflow-hidden"
+                >
+                  <div className="w-full h-52 md:h-64 bg-gray-200 animate-pulse"></div>
+
+                  <div className="p-3 space-y-2">
+                    <div className="h-3 bg-gray-200 rounded animate-pulse w-16"></div>
+                    <div className="h-4 bg-gray-200 rounded animate-pulse w-full"></div>
+                    <div className="h-4 bg-gray-200 rounded animate-pulse w-24"></div>
                   </div>
                 </div>
-                {product.deleted && (
-                  <p className="text-xs text-red-500 mt-1">Product deleted</p>
-                )}
-                {product.stock <= 0 && (
-                  <p className="text-xs text-orange-500 mt-1">Coming Soon</p>
-                )}
-              </div>
-            </Link>
-          ))
-        ) : (
-          <p className="col-span-full text-center text-gray-500">
-            No products found for this genre.
-          </p>
-        )}
-      </div>
-
-      {loading && (
-        <div className="flex justify-center mt-4">
-          <p className="text-sm text-gray-500">Loading...</p>
+              ))}
+          </div>
         </div>
       )}
-      <div ref={observerRef}></div>
+
+      {/* Products */}
+
+
+      {/* Empty State */}
+      {!initialLoading && products.length === 0 && (
+        <div className="text-center text-gray-500 py-8">
+          No products found for this genre.
+        </div>
+      )}
+
+      <div ref={loader} className=""></div>
     </div>
   );
 };
