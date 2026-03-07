@@ -145,7 +145,7 @@ function NavBar({ children }) {
               className="flex items-center mt-2"
             >
               <FaOpencart size={20} className="relative" />
-              <span className="absolute top-3 text-xs ml-2 px-1 bg-orange-700 rounded-full text-white">
+              <span className="absolute text-xs ml-2 mb-8 px-1 py-0.25 bg-orange-700 rounded-[50%] text-white">
                 {getId() ? items.length : totalItems}
               </span>
             </Link>

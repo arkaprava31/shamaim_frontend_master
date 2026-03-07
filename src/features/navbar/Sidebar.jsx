@@ -156,7 +156,7 @@ const Sidebar = ({ toggle, handleClick }) => {
       ],
     },
     { name: 'Help', link: '/contactus', icon: <PiHeadset /> },
-    { name: 'About Us', link: '/aboutus', icon: <FcAbout /> },
+    // { name: 'About Us', link: '/aboutus', icon: <FcAbout /> },
     { name: 'Custom Design', link: '/', icon: <BiSolidCustomize /> },
   ];
 
@@ -173,7 +173,7 @@ const Sidebar = ({ toggle, handleClick }) => {
             <img src={Logo} className="w-8 h-8" alt="logo" />
             <div className="flex justify-center items-center gap-3">
               <BiSolidUser className="text-white" size={24} />
-              {id ? "Hello User" : <Link to={'/login'} className="text-lg">Login/Signup</Link>}
+              {id ? `Hello ${localStorage.getItem("firstName")}` : <Link to={'/login'} className="text-lg">Login/Signup</Link>}
             </div>
           </div>
           <button onClick={handleClick} className="text-3xl focus:outline-none">
@@ -204,10 +204,10 @@ const Sidebar = ({ toggle, handleClick }) => {
           ))}
         </div>
         <div className="p-4 border-t border-gray-200">
-          <p className="text-center">Follow Us</p>
-          <div className="flex justify-center items-center space-x-6 mt-2">
+          <p className="text-center text-sm text-black">Follow Us</p>
+          <div className="flex justify-center items-center space-x-6 mt-2.5">
             <a
-              href="https://www.facebook.com/profile.php?id=100093530476365&mibextid=ZbWKwL"
+              href="https://www.instagram.com/shamaim.in?igsh=MWI0aWhhaTV2azUzMQ=="
               target="_blank"
               rel="noopener noreferrer"
               className="text-2xl text-gray-600 hover:text-black"
