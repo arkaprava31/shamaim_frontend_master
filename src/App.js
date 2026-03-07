@@ -117,10 +117,16 @@ const router = createBrowserRouter([
       { path: "/contactus", element: <ContactUsPage /> },
       { path: "/aboutus", element: <AboutUsPage /> },
       { path: "/termscondition", element: <TermConditionmain /> },
+
       { path: "/men/crewneck/:pattern", element: <CrewneckMen /> },
       { path: "/women/crewneck/:pattern", element: <CrewneckWomen /> },
       { path: "/men/oversized/:pattern", element: <OversizedMen /> },
       { path: "/women/oversized/:pattern", element: <OversizedWomen /> },
+      { path: "/men/hoodies/crewneck/:pattern", element: <MenHoddiesCreackneak /> },
+      { path: "/men/hoodies/oversized/:pattern", element: <MenHoddiesDropShoulder /> },
+      { path: "/women/hoodies/oversized/:pattern", element: <WomenHoddiesDropShoulder />, },
+      { path: "/women/hoodies/crewneck/:pattern", element: <WomenHoddiesCreackneak /> },
+
       { path: "/sports", element: <SportsProductPage /> },
       { path: "/bangla", element: <BanglaProductPage /> },
       { path: "/superhero", element: <SuperheroProductPage /> },
@@ -129,18 +135,13 @@ const router = createBrowserRouter([
       { path: "/doodle", element: <DoodleProductPage /> },
       { path: "/movie", element: <MoviesProductPage /> },
       { path: "/abstract-typo", element: <AbstractTypoProductPage /> },
+
       { path: "/genre/:name", element: <Genrepage /> },
+      
       { path: "/filter", element: <FilterSidebar /> },
       { path: "/sort", element: <SortSidebar /> },
       { path: "/address", element: <Addaddress /> },
       { path: "/logout", element: <Logout /> },
-      { path: "/men/hoodies/crewneck/:pattern", element: <MenHoddiesCreackneak /> },
-      { path: "/men/hoodies/oversized/:pattern", element: <MenHoddiesDropShoulder /> },
-      {
-        path: "/women/hoodies/oversized/:pattern",
-        element: <WomenHoddiesDropShoulder />,
-      },
-      { path: "/women/hoodies/crewneck/:pattern", element: <WomenHoddiesCreackneak /> },
 
       { path: "*", element: <PageNotFound /> },
     ],

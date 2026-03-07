@@ -247,7 +247,7 @@ export const Genrepage = () => {
 
       {/* Empty State */}
       {!initialLoading && products.length === 0 && (
-        <div className="text-center text-gray-500 py-8">
+        <div className="text-center text-gray-500 py-8 text-sm">
           No products found for this genre.
         </div>
       )}
