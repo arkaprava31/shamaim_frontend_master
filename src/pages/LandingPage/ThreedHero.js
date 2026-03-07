@@ -29,15 +29,15 @@ const ThreeDTShirt = () => {
   const settings = {
     dots: true,
     infinite: true,
-    speed: 500, // Adjust speed for a smoother transition
+    speed: 500, 
     slidesToShow: 1,
     slidesToScroll: 1,
     autoplay: true,
-    autoplaySpeed: 3000, // Autoplay interval set to 3 seconds
+    autoplaySpeed: 3000,
   };
 
   return (
-    <div className="mt-2 md:mt-5">
+    <div className="">
       <Slider {...settings}>
         {images.map((item, index) => (
           <Link key={index} to={item.link}>
@@ -45,6 +45,7 @@ const ThreeDTShirt = () => {
               <img
                 src={item.url}
                 alt={item.name}
+                loading="lazy"
                 className="zoomable-image"
               />
             </div>
