@@ -1,8 +1,21 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import Slider from 'react-slick';
 
 const ThreeDTShirt = () => {
+  const [loadedImages, setLoadedImages] = useState({});
+
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, []);
+
+  const handleImageLoad = (index) => {
+    setLoadedImages((prev) => ({
+      ...prev,
+      [index]: true,
+    }));
+  };
+
   const images = [
     {
       name: 'Banner_1',
@@ -29,7 +42,7 @@ const ThreeDTShirt = () => {
   const settings = {
     dots: true,
     infinite: true,
-    speed: 500, 
+    speed: 500,
     slidesToShow: 1,
     slidesToScroll: 1,
     autoplay: true,
@@ -37,17 +50,29 @@ const ThreeDTShirt = () => {
   };
 
   return (
-    <div className="">
+    <div>
       <Slider {...settings}>
         {images.map((item, index) => (
           <Link key={index} to={item.link}>
-            <div key={index} className="image-container">
+            <div className="relative">
+
+              {/* Skeleton */}
+              {!loadedImages[index] && (
+                <div className="w-full h-[37.5rem] bg-gray-200 animate-pulse rounded flex items-center justify-center">
+                  <p className="text-gray-500">{item.name}</p>
+                </div>
+              )}
+
               <img
                 src={item.url}
                 alt={item.name}
                 loading="lazy"
-                className="zoomable-image"
+                onLoad={() => handleImageLoad(index)}
+                className={`zoomable-image w-full ${
+                  !loadedImages[index] ? "hidden" : "block"
+                }`}
               />
+
             </div>
           </Link>
         ))}

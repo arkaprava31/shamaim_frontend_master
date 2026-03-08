@@ -1,6 +1,6 @@
 export default function HeroVideo() {
   return (
-    <div className="w-full">
+    <div className="relative w-full">
       <video
         autoPlay
         muted
@@ -14,6 +14,12 @@ export default function HeroVideo() {
           type="video/mp4"
         />
       </video>
+
+      {/* top fade */}
+      <div className="absolute top-0 left-0 w-full h-20 bg-gradient-to-b from-white to-transparent"></div>
+
+      {/* bottom fade */}
+      <div className="absolute bottom-0 left-0 w-full h-12 bg-gradient-to-t from-white to-transparent"></div>
     </div>
   );
 }
