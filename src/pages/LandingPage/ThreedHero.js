@@ -58,7 +58,7 @@ const ThreeDTShirt = () => {
 
               {/* Skeleton */}
               {!loadedImages[index] && (
-                <div className="w-full h-[37.5rem] bg-gray-200 animate-pulse rounded flex items-center justify-center">
+                <div className="w-full h-[12rem] lg:h-[37.5rem] bg-gray-200 animate-pulse rounded flex items-center justify-center">
                   <p className="text-gray-500">{item.name}</p>
                 </div>
               )}
@@ -68,7 +68,7 @@ const ThreeDTShirt = () => {
                 alt={item.name}
                 loading="lazy"
                 onLoad={() => handleImageLoad(index)}
-                className={`zoomable-image w-full ${
+                className={`zoomable-image w-full h-[12rem] lg:h-[37.5rem] ${
                   !loadedImages[index] ? "hidden" : "block"
                 }`}
               />

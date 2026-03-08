@@ -97,7 +97,7 @@ const Allgenre = () => {
 
               {/* Skeleton */}
               {!loadedImages[index] && (
-                <div className="w-full h-[30rem] bg-gray-200 animate-pulse rounded-lg flex items-center justify-center">
+                <div className="w-full h-[13rem] lg:h-[30rem] bg-gray-200 animate-pulse rounded-lg flex items-center justify-center">
                   <p className="text-gray-500">{genre.name}</p>
                 </div>
               )}
@@ -106,7 +106,7 @@ const Allgenre = () => {
                 src={genre.img}
                 alt="Genre"
                 onLoad={() => handleImageLoad(index)}
-                className={`w-full h-auto transform transition-transform duration-500 hover:scale-50 ${!loadedImages[index] ? "hidden" : "block"
+                className={`w-full h-[13rem] lg:h-[30rem] transform transition-transform duration-500 hover:scale-50 ${!loadedImages[index] ? "hidden" : "block"
                   }`}
               />
 
