@@ -7,7 +7,7 @@ export const Homepage = () => {
       <div>
         <NavBar/>
       </div>
-      <div>
+      <div className="w-full">
         <Outlet />
       </div>
       <div>

@@ -1,17 +1,23 @@
-import { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { fetchProductsByFiltersAsync } from "../productSlice";
 import { useDispatch } from "react-redux";
 import { Link } from "react-router-dom";
 
 export default function ProductList() {
   const [products, setProducts] = useState([]);
+  const [loadedImages, setLoadedImages] = useState({});
   const [page, setPage] = useState(1);
   const [loading, setLoading] = useState(false);
+  const [initialLoading, setInitialLoading] = useState(true);
   const [hasMore, setHasMore] = useState(true);
   const [error, setError] = useState(null);
 
   const dispatch = useDispatch();
   const loader = useRef(null);
+
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, []);
 
   const fetchProducts = async () => {
     if (loading || !hasMore) return;
@@ -36,6 +42,7 @@ export default function ProductList() {
     }
 
     setLoading(false);
+    setInitialLoading(false);
   };
 
   useEffect(() => {
@@ -57,6 +64,10 @@ export default function ProductList() {
     return () => observer.disconnect();
   }, [loading, hasMore]);
 
+  const handleImageLoad = (id) => {
+    setLoadedImages((prev) => ({ ...prev, [id]: true }));
+  };
+
   return (
     <>
       <p className="relative p-1 my-4 text-2xl font-bold text-center">
@@ -65,13 +76,26 @@ export default function ProductList() {
 
       {error && <p className="text-center text-red-500">{error}</p>}
 
-      <div className="w-full flex justify-center">
-        {products.length === 0 ? (
-          <div className="text-center text-gray-700 text-sm">
-            No products found.
-          </div>
-        ) : (
+      {(initialLoading || products.length !== 0) && (
+        <div className="w-full flex justify-center">
           <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-5 md:gap-8 p-4 w-full md:w-[80%] font-poppins">
+
+            {initialLoading &&
+              [...Array(8)].map((_, i) => (
+                <div
+                  key={i}
+                  className="bg-white rounded-2xl border border-gray-100 overflow-hidden"
+                >
+                  <div className="w-full h-52 md:h-64 bg-gray-200 animate-pulse"></div>
+
+                  <div className="p-3 space-y-2">
+                    <div className="h-3 bg-gray-200 rounded animate-pulse w-16"></div>
+                    <div className="h-4 bg-gray-200 rounded animate-pulse w-full"></div>
+                    <div className="h-4 bg-gray-200 rounded animate-pulse w-24"></div>
+                  </div>
+                </div>
+              ))}
+
             {products.map((product) => {
               const discountedPrice = Math.floor(
                 product.price -
@@ -86,10 +110,19 @@ export default function ProductList() {
                   hover:shadow-xl hover:-translate-y-1 transition-all duration-300"
                 >
                   <div className="relative overflow-hidden">
+
+                    {!loadedImages[product.id] && (
+                      <div className="absolute inset-0 bg-gray-200 animate-pulse"></div>
+                    )}
+
                     <img
                       src={product.thumbnail}
                       alt={product.title}
-                      className="w-full h-52 md:h-64 object-cover group-hover:scale-105 transition duration-300"
+                      loading="lazy"
+                      onLoad={() => handleImageLoad(product.id)}
+                      className={`w-full h-52 md:h-64 object-cover group-hover:scale-105 transition duration-300 ${
+                        loadedImages[product.id] ? "opacity-100" : "opacity-0"
+                      }`}
                     />
 
                     {product.discountPercentage > 0 && (
@@ -125,13 +158,33 @@ export default function ProductList() {
                 </Link>
               );
             })}
+
+            {loading &&
+              [...Array(4)].map((_, i) => (
+                <div
+                  key={"loading" + i}
+                  className="bg-white rounded-2xl border border-gray-100 overflow-hidden"
+                >
+                  <div className="w-full h-52 md:h-64 bg-gray-200 animate-pulse"></div>
+
+                  <div className="p-3 space-y-2">
+                    <div className="h-3 bg-gray-200 rounded animate-pulse w-16"></div>
+                    <div className="h-4 bg-gray-200 rounded animate-pulse w-full"></div>
+                    <div className="h-4 bg-gray-200 rounded animate-pulse w-24"></div>
+                  </div>
+                </div>
+              ))}
           </div>
-        )}
-      </div>
+        </div>
+      )}
 
-      {loading && <p className="text-center py-4">Loading products...</p>}
+      {!initialLoading && products.length === 0 && (
+        <div className="text-center text-gray-700 text-sm py-8">
+          No products found.
+        </div>
+      )}
 
-      <div ref={loader} className="h-10"></div>
+      <div ref={loader} className=""></div>
     </>
   );
 }
