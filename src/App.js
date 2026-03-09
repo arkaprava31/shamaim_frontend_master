@@ -28,14 +28,6 @@ import ContactUsPage from "./pages/ContactUsPage";
 import CrewneckWomen from "./pages/LandingPage/Allothercategory/CrewneckWomen";
 import OversizedMen from "./pages/LandingPage/Allothercategory/OversizedMen";
 import OversizedWomen from "./pages/LandingPage/Allothercategory/OversizedWomen";
-import SportsProductPage from "./pages/Allgenre/SportsProductPage";
-import DoodleProductPage from "./pages/Allgenre/DoodleProductPage";
-import SuperheroProductPage from "./pages/Allgenre/SuperheroProductPage";
-import MoviesProductPage from "./pages/Allgenre/MoviesProductPage";
-import AnimeProductPage from "./pages/Allgenre/AnimeProductPage";
-import AbstractTypoProductPage from "./pages/Allgenre/AbstractTypoProductPage";
-import MusicProductPage from "./pages/Allgenre/MusicProductPage";
-import BanglaProductPage from "./pages/Allgenre/BanglaProductPage";
 import RefundReturnPolicy from "./pages/LandingPage/Terms&condition/Refund&ReturnPolicy";
 import TermConditionmain from "./pages/LandingPage/Terms&condition/terms&condtionMain";
 import { CrewneckMen } from "./pages/LandingPage/Allothercategory/CrewneckMen";
@@ -123,15 +115,6 @@ const router = createBrowserRouter([
       { path: "/men/hoodies/oversized/:pattern", element: <MenHoddiesDropShoulder /> },
       { path: "/women/hoodies/oversized/:pattern", element: <WomenHoddiesDropShoulder />, },
       { path: "/women/hoodies/crewneck/:pattern", element: <WomenHoddiesCreackneak /> },
-
-      { path: "/sports", element: <SportsProductPage /> },
-      { path: "/bangla", element: <BanglaProductPage /> },
-      { path: "/superhero", element: <SuperheroProductPage /> },
-      { path: "/musicband", element: <MusicProductPage /> },
-      { path: "/anime", element: <AnimeProductPage /> },
-      { path: "/doodle", element: <DoodleProductPage /> },
-      { path: "/movie", element: <MoviesProductPage /> },
-      { path: "/abstract-typo", element: <AbstractTypoProductPage /> },
 
       { path: "/banner/:bannerId", element: <ComingSoon /> },
       { path: "/genre/:name", element: <Genrepage /> },
