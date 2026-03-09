@@ -54,11 +54,10 @@ const ThreeDTShirt = () => {
       <Slider {...settings}>
         {images.map((item, index) => (
           <Link key={index} to={item.link}>
-            <div className="relative">
+            <div className="relative w-full h-[12rem] lg:h-[37.5rem] overflow-hidden">
 
-              {/* Skeleton */}
               {!loadedImages[index] && (
-                <div className="w-full h-[12rem] lg:h-[37.5rem] bg-gray-200 animate-pulse rounded flex items-center justify-center">
+                <div className="absolute inset-0 bg-gray-200 animate-pulse flex items-center justify-center">
                   <p className="text-gray-500">{item.name}</p>
                 </div>
               )}
@@ -68,9 +67,8 @@ const ThreeDTShirt = () => {
                 alt={item.name}
                 loading="lazy"
                 onLoad={() => handleImageLoad(index)}
-                className={`zoomable-image w-full h-[12rem] lg:h-[37.5rem] ${
-                  !loadedImages[index] ? "hidden" : "block"
-                }`}
+                className={`zoomable-image w-full h-full object-cover transition-opacity duration-500 ${loadedImages[index] ? "opacity-100" : "opacity-0"
+                  }`}
               />
 
             </div>

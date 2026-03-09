@@ -1,7 +1,7 @@
 import "./App.css";
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
-import { useDispatch, useSelector } from "react-redux";
+import { useDispatch } from "react-redux";
 import { Provider, positions } from "react-alert";
 import AlertTemplate from "react-alert-template-basic";
 
@@ -11,11 +11,6 @@ import CartPage from "./pages/CartPage";
 import Checkout from "./pages/Checkout";
 import ProductDetailPage from "./pages/ProductDetailPage";
 import Protected from "./features/auth/components/Protected";
-import {
-  // checkAuthAsync,
-  selectLoggedInUser,
-  selectUserChecked,
-} from "./features/auth/authSlice";
 import {
   fetchItemsByUserIdAsync,
   addToCartAsync,
@@ -45,7 +40,6 @@ import RefundReturnPolicy from "./pages/LandingPage/Terms&condition/Refund&Retur
 import TermConditionmain from "./pages/LandingPage/Terms&condition/terms&condtionMain";
 import { CrewneckMen } from "./pages/LandingPage/Allothercategory/CrewneckMen";
 import UserOrdersDetails from "./pages/useroredrDetails";
-import NavBar from "./features/navbar/Navbar";
 import Loader from "./app/loader"; // Import the Loader component
 import FilterSidebar from "./pages/filter/filter";
 import SortSidebar from "./pages/Sort/sort";
@@ -59,6 +53,7 @@ import MenHoddiesDropShoulder from "./features/productmen/components/MenHoddiesd
 import WomenHoddiesDropShoulder from "./features/productmen/components/WoMenHoddiesDropShoulder";
 import WomenHoddiesCreackneak from "./features/productmen/components/woMenHoddiesCreakNeak";
 import { Genrepage } from "./pages/genrePage";
+import ComingSoon from "./pages/ComingSoon";
 
 const options = {
   timeout: 5000,
@@ -122,6 +117,8 @@ const router = createBrowserRouter([
       { path: "/women/crewneck/:pattern", element: <CrewneckWomen /> },
       { path: "/men/oversized/:pattern", element: <OversizedMen /> },
       { path: "/women/oversized/:pattern", element: <OversizedWomen /> },
+      { path: "/men/polo/:pattern", element: <ComingSoon /> },
+      { path: "/women/polo/:pattern", element: <ComingSoon /> },
       { path: "/men/hoodies/crewneck/:pattern", element: <MenHoddiesCreackneak /> },
       { path: "/men/hoodies/oversized/:pattern", element: <MenHoddiesDropShoulder /> },
       { path: "/women/hoodies/oversized/:pattern", element: <WomenHoddiesDropShoulder />, },
@@ -136,14 +133,16 @@ const router = createBrowserRouter([
       { path: "/movie", element: <MoviesProductPage /> },
       { path: "/abstract-typo", element: <AbstractTypoProductPage /> },
 
+      { path: "/banner/:bannerId", element: <ComingSoon /> },
       { path: "/genre/:name", element: <Genrepage /> },
-      
+
       { path: "/filter", element: <FilterSidebar /> },
       { path: "/sort", element: <SortSidebar /> },
       { path: "/address", element: <Addaddress /> },
       { path: "/logout", element: <Logout /> },
 
       { path: "*", element: <PageNotFound /> },
+      { path: "/coming-soon", element: <ComingSoon /> },
     ],
   },
 ]);
@@ -151,26 +150,32 @@ const router = createBrowserRouter([
 function App() {
   const dispatch = useDispatch();
   const user = localStorage.getItem("id");
-  // const userChecked = useSelector(selectUserChecked);
-  const userChecked = true;
-  const [loading, setLoading] = useState(false);
-
-  // useEffect(() => {
-  //   dispatch(checkAuthAsync()).then(() => setLoading(false));
-  // }, [dispatch]);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    if (user) {
-      dispatch(fetchItemsByUserIdAsync());
-      dispatch(addToCartAsync());
-      dispatch(fetchLoggedInUserAsync());
-    }
+    const loadData = async () => {
+      if (user) {
+        try {
+          await Promise.all([
+            dispatch(fetchItemsByUserIdAsync()),
+            dispatch(addToCartAsync()),
+            dispatch(fetchLoggedInUserAsync()),
+          ]);
+        } finally {
+          setLoading(false);
+        }
+      } else {
+        setLoading(false);
+      }
+    };
+
+    loadData();
   }, [dispatch, user]);
 
   return (
     <AppProvider>
       <div className="App">
-        {loading || !userChecked ? (
+        {loading ? (
           <Loader />
         ) : (
           <Provider template={AlertTemplate} {...options}>
