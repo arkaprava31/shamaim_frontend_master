@@ -11,6 +11,7 @@ export default function ProductList() {
   const [initialLoading, setInitialLoading] = useState(true);
   const [hasMore, setHasMore] = useState(true);
   const [error, setError] = useState(null);
+  
 
   const dispatch = useDispatch();
   const loader = useRef(null);
