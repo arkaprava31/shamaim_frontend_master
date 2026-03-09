@@ -20,38 +20,46 @@ export const Genrepage = () => {
     {
       name: "Abstract",
       url: "https://firebasestorage.googleapis.com/v0/b/shamaim-lifestyle.appspot.com/o/Homejonnerbox%2FModern%20abstract.png?alt=media&token=6343626f-1745-4135-8e79-238bd9a3ede1",
+      link: "abstract",
     },
     {
       name: "Anime",
       url: "https://firebasestorage.googleapis.com/v0/b/shamaim-lifestyle.appspot.com/o/Homejonnerbox%2FAnime.png?alt=media&token=c27952ea-efb5-4fd9-8a42-6cef4e80350f",
+      link: "anime",
     },
     {
       name: "Bangla O Bangali",
       url: "https://firebasestorage.googleapis.com/v0/b/shamaim-lifestyle.appspot.com/o/Assets%2FBanglaBanner.png?alt=media&token=8b9ecf3c-9842-4704-a22f-743e13cebf79",
+      link: "bangla-o-bangali",
     },
     {
       name: "Drip & Doodle",
       url: "https://firebasestorage.googleapis.com/v0/b/shamaim-lifestyle.appspot.com/o/Assets%2Fdoodlebanner.png?alt=media&token=550ee544-c797-4827-807c-5a9c88d7a6e0",
+      link: "drip-&-doodle",
     },
     {
       name: "Movies & Series",
       url: "https://firebasestorage.googleapis.com/v0/b/shamaim-lifestyle.appspot.com/o/Homejonnerbox%2FMoves%20and%20series.png?alt=media&token=bb4cbca6-122f-4460-9349-8759ade881d9",
+      link: "movies-&-series",
     },
     {
       name: "Music & Band",
       url: "https://firebasestorage.googleapis.com/v0/b/shamaim-lifestyle.appspot.com/o/Homejonnerbox%2FMusic%20and%20Band.png?alt=media&token=7fef1713-3f6d-4f63-b492-ae1db15bc6f6",
+      link: "music-&-band",
     },
     {
       name: "Sports",
       url: "https://firebasestorage.googleapis.com/v0/b/shamaim-lifestyle.appspot.com/o/Homejonnerbox%2FSports.png?alt=media&token=9857f2eb-2e39-4f64-932e-74212fa0966f",
+      link: "sports",
     },
     {
       name: "Superhero",
       url: "https://firebasestorage.googleapis.com/v0/b/shamaim-lifestyle.appspot.com/o/Homejonnerbox%2FSuper%20Heroes.png?alt=media&token=907bb203-c044-4a3b-94eb-051b07c0e5f6",
+      link: "superhero",
     },
   ];
 
-  const banner = generUi.find((g) => g.name === name);
+  const banner = generUi.find((g) => g.link === name);
 
   useEffect(() => {
     window.scrollTo(0, 0);
@@ -64,7 +72,7 @@ export const Genrepage = () => {
 
     try {
       const response = await axios.get(
-        `${baseUrl}/products?genre=${name}&pages=${page}`
+        `${baseUrl}/products?genre=${encodeURIComponent(banner.name)}&pages=${page}`
       );
 
       const newProducts = response?.data?.docs || [];
