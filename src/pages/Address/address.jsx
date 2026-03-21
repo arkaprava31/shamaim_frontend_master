@@ -4,6 +4,7 @@ import { useSelector, useDispatch } from "react-redux";
 import { useAlert } from "react-alert";
 import { FaRegEdit } from "react-icons/fa";
 import { IoMdRemoveCircleOutline } from "react-icons/io";
+import GridLoader from "../../app/GridLoader";
 
 export const Addaddress = () => {
   const dispatch = useDispatch();
@@ -147,92 +148,98 @@ export const Addaddress = () => {
         </p>
       </div>
 
-      {user?.addresses?.length > 0 ? (
-        <div className="w-full flex flex-wrap gap-4">
-          {user.addresses.map((item, index) => (
-            <div
-              key={index}
-              className="group bg-white rounded-2xl border border-indigo-100 p-5
+      {
+        !user?.addresses ? <GridLoader /> :
+          user?.addresses?.length > 0 ? (
+            <div className="w-full flex flex-wrap gap-4">
+              {user.addresses.map((item, index) => (
+                <div
+                  key={index}
+                  className="group bg-white rounded-2xl border border-indigo-100 p-5
                          hover:shadow-lg hover:border-indigo-300 transition-all duration-200 min-w-[30%]"
-            >
-              <div className="flex justify-between items-start gap-4">
-                <div className="min-w-0">
-                  <p className="text-base font-semibold text-indigo-700">
-                    {item.name}
-                  </p>
+                >
+                  <div className="flex justify-between items-start gap-4">
+                    <div className="min-w-0">
+                      <p className="text-base font-semibold text-indigo-700">
+                        {item.name}
+                      </p>
 
-                  <p className="text-sm text-gray-500 mt-1">
-                    {item.email}
-                  </p>
+                      <p className="text-sm text-gray-500 mt-1">
+                        {item.email}
+                      </p>
 
-                  <p className="text-sm text-gray-700 mt-2">
-                    {item.street}, {item.city}
-                  </p>
+                      <p className="text-sm text-gray-700 mt-2">
+                        {item.street}, {item.city}
+                      </p>
 
-                  <p className="text-sm text-gray-700">
-                    {item.state} - {item.pinCode}
-                  </p>
+                      <p className="text-sm text-gray-700">
+                        {item.state} - {item.pinCode}
+                      </p>
 
-                  <p className="text-sm text-gray-600 mt-2">
-                    📞 {item.phone}
-                  </p>
+                      <p className="text-sm text-gray-600 mt-2">
+                        📞 {item.phone}
+                      </p>
 
-                  <div className="mt-3 flex items-center gap-3">
-                    <button
-                      onClick={() => handleEditAddress(index)}
-                      className="text-indigo-600 font-medium text-lg hover:text-xl"
-                    >
-                      <FaRegEdit />
-                    </button>
+                      <div className="mt-3 flex items-center gap-3">
+                        <button
+                          onClick={() => handleEditAddress(index)}
+                          className="text-indigo-600 font-medium text-lg hover:text-xl"
+                        >
+                          <FaRegEdit />
+                        </button>
 
-                    <button
-                      onClick={() => {setCurrentAddressIndex(index); setCnfDltPopUp(true)}}
-                      className="text-red-600 font-medium text-xl hover:text-2xl"
-                    >
-                      <IoMdRemoveCircleOutline />
-                    </button>
+                        <button
+                          onClick={() => { setCurrentAddressIndex(index); setCnfDltPopUp(true) }}
+                          className="text-red-600 font-medium text-xl hover:text-2xl"
+                        >
+                          <IoMdRemoveCircleOutline />
+                        </button>
+                      </div>
+                    </div>
+
+                    <span className="text-xs bg-indigo-100 text-indigo-600 px-3 py-1 rounded-full">
+                      Saved
+                    </span>
                   </div>
                 </div>
-
-                <span className="text-xs bg-indigo-100 text-indigo-600 px-3 py-1 rounded-full">
-                  Saved
-                </span>
-              </div>
+              ))}
             </div>
-          ))}
-        </div>
-      ) : (
-        <div className="bg-white rounded-2xl border border-indigo-100 p-10 text-center shadow-sm">
-          <p className="text-gray-700 text-lg font-medium">
-            No addresses added yet
-          </p>
-          <p className="text-sm text-gray-500 mt-1">
-            Add a delivery address to continue
-          </p>
-        </div>
-      )}
+          ) : (
+            <div className="bg-white rounded-2xl border border-indigo-100 p-10 text-center shadow-sm">
+              <p className="text-gray-700 text-lg font-medium">
+                No addresses added yet
+              </p>
+              <p className="text-sm text-gray-500 mt-1">
+                Add a delivery address to continue
+              </p>
+            </div>
+          )
+      }
 
-      <div className="mt-8">
-        <button
-          onClick={() => {
-            setOpenPopUp(true);
-            setSelectedAddressIndex(null);
-            setData({
-              name: "",
-              email: "",
-              phone: "",
-              street: "",
-              city: "",
-              state: "",
-              pinCode: "",
-            })
-          }}
-          className="rounded-full bg-gradient-to-r from-indigo-600 to-purple-600
+      {
+        user?.addresses &&
+        <div className="mt-8">
+          <button
+            onClick={() => {
+              setOpenPopUp(true);
+              setSelectedAddressIndex(null);
+              setData({
+                name: "",
+                email: "",
+                phone: "",
+                street: "",
+                city: "",
+                state: "",
+                pinCode: "",
+              })
+            }}
+            className="rounded-full bg-gradient-to-r from-indigo-600 to-purple-600
                      px-6 py-2.5 text-sm font-semibold text-white hover:opacity-90"
-        >
-          + Add New Address
-        </button>
-      </div>
+          >
+            + Add New Address
+          </button>
+        </div>
+      }
 
       {openPopUp && (
         <div className="fixed inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center z-50 px-4">

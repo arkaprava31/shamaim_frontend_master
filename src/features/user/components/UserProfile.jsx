@@ -43,7 +43,7 @@ export const UserProfile = () => {
 
       {/* HERO PROFILE */}
       <div className="relative px-6 pt-10 pb-24">
-        <div className="absolute inset-0 bg-gradient-to-r from-indigo-600 to-blue-600 z-0" />
+        <div className="absolute inset-0 bg-gradient-to-r from-indigo-600 to-purple-600 z-0" />
 
         <div className="relative z-10 flex flex-col items-center text-white">
           <div className="flex h-20 w-20 items-center justify-center rounded-full bg-white/20 text-3xl font-semibold backdrop-blur">

@@ -121,7 +121,7 @@ const router = createBrowserRouter([
 
       { path: "/filter", element: <FilterSidebar /> },
       { path: "/sort", element: <SortSidebar /> },
-      { path: "/address", element: <Addaddress /> },
+      { path: "/address", element: <Protected><Addaddress /></Protected> },
       { path: "/logout", element: <Logout /> },
 
       { path: "*", element: <PageNotFound /> },

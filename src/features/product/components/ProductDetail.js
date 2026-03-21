@@ -180,8 +180,8 @@ export default function ProductDetail() {
         <div className="flex items-center justify-center h-screen bg-white">
 
         <Grid
-          height="200"
-          width="150"
+          height="80"
+          width="80"
           color="rgb(79, 70, 229) "
           ariaLabel="grid-loading"
           radius="12.5"

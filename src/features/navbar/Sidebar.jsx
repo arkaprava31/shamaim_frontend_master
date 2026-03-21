@@ -1,9 +1,7 @@
 import { Link } from 'react-router-dom';
 import { FaInstagram, FaFacebook } from 'react-icons/fa';
 import { BiSolidCustomize, BiSolidUser } from "react-icons/bi";
-import { GiFemaleVampire } from "react-icons/gi";
 import { FcBusinessman, FcBusinesswoman, FcAbout } from "react-icons/fc";
-import { GrUserManager } from "react-icons/gr";
 import { PiHeadset } from "react-icons/pi";
 import { getId } from '../../app/constants';
 import Logo from "./sitelogo.png";
@@ -155,9 +153,9 @@ const Sidebar = ({ toggle, handleClick }) => {
         },
       ],
     },
-    { name: 'Help', link: '/contactus', icon: <PiHeadset /> },
+    { name: 'Need Help?', link: '/contactus', icon: <PiHeadset /> },
     // { name: 'About Us', link: '/aboutus', icon: <FcAbout /> },
-    { name: 'Custom Design', link: '/', icon: <BiSolidCustomize /> },
+    { name: 'Custom Design', link: '/coming-soon', icon: <BiSolidCustomize /> },
   ];
 
   const id = getId();
