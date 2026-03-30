@@ -12,7 +12,7 @@ import {
   selectProductListStatus,
 } from "../productSlice";
 import { useParams } from "react-router-dom";
-import { addToCartAsync, selectItems } from "../../cart/cartSlice";
+import { addToCartAsync, fetchItemsByUserIdAsync, selectItems } from "../../cart/cartSlice";
 import { selectLoggedInUser } from "../../auth/authSlice";
 import { useAlert } from "react-alert";
 import { Grid } from "react-loader-spinner";
@@ -52,12 +52,83 @@ const sizes = [
 ];
 
 const sizeChart = [
-  { name: "S", chest: 38.0, front: 27.25, sleeve: 8.0 },
-  { name: "M", chest: 40.0, front: 28.0, sleeve: 8.25 },
-  { name: "L", chest: 42.0, front: 28.75, sleeve: 8.5 },
-  { name: "XL", chest: 44.0, front: 29.5, sleeve: 8.75 },
-  { name: "2XL", chest: 46.0, front: 30.0, sleeve: 9.0 },
-  { name: "3XL", chest: 48.0, front: 30.5, sleeve: 9.25 },
+  {
+    category: "TShirts",
+    type: "Classic Fit",
+    gender: "Unisex",
+    chart: [
+      { name: "S", chest: 38.0, front: 27.25, sleeve: 8.0 },
+      { name: "M", chest: 40.0, front: 28.0, sleeve: 8.25 },
+      { name: "L", chest: 42.0, front: 28.75, sleeve: 8.5 },
+      { name: "XL", chest: 44.0, front: 29.5, sleeve: 8.75 },
+      { name: "2XL", chest: 46.0, front: 30.0, sleeve: 9.0 },
+      { name: "3XL", chest: 48.0, front: 30.5, sleeve: 9.25 }
+    ]
+  },
+  {
+    category: "TShirts",
+    type: "Drop Shoulder",
+    gender: "Unisex",
+    chart: [
+      { name: "S", chest: 42.0, front: 29.0, sleeve: 9.75 },
+      { name: "M", chest: 44.0, front: 29.75, sleeve: 10.0 },
+      { name: "L", chest: 46.0, front: 30.5, sleeve: 10.25 },
+      { name: "XL", chest: 48.0, front: 31.25, sleeve: 10.5 },
+      { name: "2XL", chest: 50.0, front: 32.0, sleeve: 10.75 },
+      { name: "3XL", chest: 52.0, front: 32.75, sleeve: 11.0 }
+    ]
+  },
+  {
+    category: "TShirts",
+    type: "Polo Tees",
+    gender: "Male",
+    chart: [
+      { name: "S", chest: 38.0, front: 26.5, sleeve: 8.0 },
+      { name: "M", chest: 40.0, front: 27.25, sleeve: 8.25 },
+      { name: "L", chest: 42.0, front: 28.0, sleeve: 8.5 },
+      { name: "XL", chest: 44.0, front: 28.75, sleeve: 8.75 },
+      { name: "2XL", chest: 46.0, front: 29.5, sleeve: 9.0 },
+      { name: "3XL", chest: 49.0, front: 30.25, sleeve: 9.25 }
+    ]
+  },
+  {
+    category: "TShirts",
+    type: "Polo Tees",
+    gender: "Female",
+    chart: [
+      { name: "XS", chest: 34.0, front: 19.25, sleeve: 6.75 },
+      { name: "S", chest: 36.0, front: 20.0, sleeve: 7.0 },
+      { name: "M", chest: 38.0, front: 20.75, sleeve: 7.25 },
+      { name: "L", chest: 40.0, front: 21.5, sleeve: 7.5 },
+      { name: "XL", chest: 42.0, front: 22.25, sleeve: 7.75 },
+      { name: "2XL", chest: 44.0, front: 23.0, sleeve: 8.0 },
+      { name: "3XL", chest: 46.0, front: 23.75, sleeve: 8.25 }
+    ]
+  },
+  {
+    category: "Hoodies",
+    type: "Classic Fit",
+    gender: "Unisex",
+    chart: [
+      { name: "S", chest: 38.0, front: 27.0, sleeve: 23.5 },
+      { name: "M", chest: 40.0, front: 28.0, sleeve: 24.0 },
+      { name: "L", chest: 42.0, front: 29.0, sleeve: 24.5 },
+      { name: "XL", chest: 44.0, front: 30.0, sleeve: 25.0 },
+      { name: "XXL", chest: 46.0, front: 31.0, sleeve: 25.5 }
+    ]
+  },
+  {
+    category: "Hoodies",
+    type: "Drop Shoulder",
+    gender: "Unisex",
+    chart: [
+      { name: "S", chest: 42.0, front: 0, sleeve: 0 },
+      { name: "M", chest: 44.0, front: 0, sleeve: 0 },
+      { name: "L", chest: 46.0, front: 0, sleeve: 0 },
+      { name: "XL", chest: 48.0, front: 0, sleeve: 0 },
+      { name: "XXL", chest: 50.0, front: 0, sleeve: 0 }
+    ]
+  }
 ];
 
 export default function ProductDetail() {
@@ -80,11 +151,24 @@ export default function ProductDetail() {
 
   const { updateCart, updateLoggedInCart, handleLoggedInOrGuest } = useContext(AppContext);
 
+  const [currentSizeChart, setCurrentSizeChart] = useState(null);
+
+  useEffect(() => {
+    if (product) {
+      if (product.subcategory === "Polo Tees") {
+        const currChart = sizeChart.find(chart => chart.category === product.category && chart.type === product.subcategory && chart.gender === product.gender);
+        setCurrentSizeChart(currChart);
+      } else {
+        const currChart = sizeChart.find(chart => chart.category === product.category && chart.type === product.subcategory);
+        setCurrentSizeChart(currChart);
+      }
+    }
+  }, [product]);
+
   const handleCart = async () => {
     const productprice = product.price;
     const discountpercentage = product.discountPercentage;
     const actualvalue = productprice * (discountpercentage / 100);
-
 
     const matcheditemSized = Array.isArray(items)
       ? items.find(
@@ -95,7 +179,7 @@ export default function ProductDetail() {
       : null;
 
     if (getId()) {
-      if (matcheditemSized == undefined || Object.keys(matcheditemSized).length < 0) {
+      if (!matcheditemSized) {
         if (selectedSize) {
           const newItem = {
             product: product.id,
@@ -108,7 +192,11 @@ export default function ProductDetail() {
             newItem.size = selectedSize;
             setSelectedSize("");
           }
-          dispatch(addToCartAsync({ item: newItem, alert }));
+
+          await dispatch(addToCartAsync({ item: newItem, alert }));
+
+          await dispatch(fetchItemsByUserIdAsync());
+
           alert.success("item added in cart");
 
           updateLoggedInCart(items);
@@ -179,16 +267,16 @@ export default function ProductDetail() {
       {status === "loading" ? (
         <div className="flex items-center justify-center h-screen bg-white">
 
-        <Grid
-          height="80"
-          width="80"
-          color="rgb(79, 70, 229) "
-          ariaLabel="grid-loading"
-          radius="12.5"
-          wrapperStyle={{}}
-          wrapperClass=""
-          visible={true}
-        />
+          <Grid
+            height="80"
+            width="80"
+            color="rgb(79, 70, 229) "
+            ariaLabel="grid-loading"
+            radius="12.5"
+            wrapperStyle={{}}
+            wrapperClass=""
+            visible={true}
+          />
         </div>
       ) : null}
       {product && (
@@ -544,12 +632,14 @@ export default function ProductDetail() {
                 </div> */}
 
                   <Dialog open={open} handler={handleOpen} size="lg" className="w-full flex flex-col items-center justify-start gap-1 p-4 text-black tracking-wider">
-                    <div className="w-full text-left text-lg font-semibold">Size Guide</div>
+                    <div className="w-full text-left text-lg font-semibold">
+                      Size Guide ({currentSizeChart?.type} {currentSizeChart?.category} - {currentSizeChart?.gender})
+                    </div>
                     <div className="w-full flex items-center justify-end">
                       <div className="text-white bg-black px-3 py-0.5 rounded-md">inch</div>
                     </div>
-                    <div className="w-full flex flex-col md:flex-row items-center justify-center mt-2">
-                      <div className="w-full md:w-[40%] flex items-center justify-center">
+                    <div className="w-full flex flex-col md:flex-row items-center justify-center gap-4 mt-2">
+                      <div className="w-[80%] md:w-[40%] flex items-center justify-center">
                         <img className="w-full" src="./../../guide.jpg" />
                       </div>
                       <div className="w-full md:w-[60%] flex items-center justify-start">
@@ -564,13 +654,13 @@ export default function ProductDetail() {
                           </thead>
                           <tbody>
                             {
-                              sizeChart.map(d => {
+                              currentSizeChart?.chart?.map(d => {
                                 return (
                                   <tr className="text-sm">
                                     <td>{d.name}</td>
                                     <td>{d.chest}</td>
-                                    <td>{d.front}</td>
-                                    <td>{d.sleeve}</td>
+                                    <td>{d.front !== 0 ? d.front : '-'}</td>
+                                    <td>{d.sleeve !== 0 ? d.sleeve : '-'}</td>
                                   </tr>
                                 )
                               })

@@ -14,7 +14,7 @@ function Home() {
     return (
         <div>
             <Toaster position="top-center" />
-            <HeroVideo />
+            {/* <HeroVideo /> */}
             <ThreedHero></ThreedHero>
             <Allgenre></Allgenre>
             <ProductList></ProductList>

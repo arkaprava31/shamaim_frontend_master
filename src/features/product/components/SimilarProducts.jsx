@@ -7,6 +7,7 @@ const SimilarProducts = ({ cat, subCat }) => {
   const [products, setProducts] = useState([]);
   const [page, setPage] = useState(1);
   const [loading, setLoading] = useState(false);
+  const [initialLoading, setInitialLoading] = useState(true);
   const [hasMore, setHasMore] = useState(true);
   const [error, setError] = useState(null);
 
@@ -41,6 +42,7 @@ const SimilarProducts = ({ cat, subCat }) => {
     }
 
     setLoading(false);
+    setInitialLoading(false);
   };
 
   useEffect(() => {
@@ -71,12 +73,27 @@ const SimilarProducts = ({ cat, subCat }) => {
       {error && <p className="text-center text-red-500">{error}</p>}
 
       <div className="w-full flex justify-center">
-        {products.length === 0 ? (
-          <div className="text-center text-gray-700 text-sm">
-            No similar products found.
-          </div>
-        ) : (
+        {(initialLoading || products.length !== 0) ? (
           <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-5 md:gap-8 p-4 w-full md:w-[80%] font-poppins">
+
+            {/* Initial Skeleton */}
+            {initialLoading &&
+              [...Array(8)].map((_, i) => (
+                <div
+                  key={i}
+                  className="bg-white rounded-2xl border border-gray-100 overflow-hidden"
+                >
+                  <div className="w-full h-52 md:h-64 bg-gray-200 animate-pulse"></div>
+
+                  <div className="p-3 space-y-2">
+                    <div className="h-3 bg-gray-200 rounded animate-pulse w-16"></div>
+                    <div className="h-4 bg-gray-200 rounded animate-pulse w-full"></div>
+                    <div className="h-4 bg-gray-200 rounded animate-pulse w-24"></div>
+                  </div>
+                </div>
+              ))}
+
+            {/* Products */}
             {products.map((product) => {
               const discountedPrice = Math.floor(
                 product.price -
@@ -131,11 +148,30 @@ const SimilarProducts = ({ cat, subCat }) => {
                 </Link>
               );
             })}
+
+            {/* Infinite Scroll Skeleton */}
+            {loading &&
+              [...Array(4)].map((_, i) => (
+                <div
+                  key={"loading" + i}
+                  className="bg-white rounded-2xl border border-gray-100 overflow-hidden"
+                >
+                  <div className="w-full h-52 md:h-64 bg-gray-200 animate-pulse"></div>
+
+                  <div className="p-3 space-y-2">
+                    <div className="h-3 bg-gray-200 rounded animate-pulse w-16"></div>
+                    <div className="h-4 bg-gray-200 rounded animate-pulse w-full"></div>
+                    <div className="h-4 bg-gray-200 rounded animate-pulse w-24"></div>
+                  </div>
+                </div>
+              ))}
+          </div>
+        ) : (
+          <div className="text-center text-gray-700 text-sm">
+            No similar products found.
           </div>
         )}
       </div>
-
-      {loading && <p className="text-center py-4">Loading...</p>}
 
       <div ref={loader} className="h-10"></div>
     </>

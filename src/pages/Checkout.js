@@ -1285,7 +1285,7 @@ function Checkout() {
 
                                     <Modal
                                       title={`Delete ${item.productId.title}`}
-                                      message="Are you sure you want to delete this Cart item ?"
+                                      message="Are you sure you want to delete this Cart item?"
                                       dangerOption="Delete"
                                       cancelOption="Cancel"
                                       dangerAction={(e) => handleRemove(e, item._id)}
