@@ -47,6 +47,7 @@ import WomenHoddiesCreackneak from "./features/productmen/components/woMenHoddie
 import { Genrepage } from "./pages/genrePage";
 import ComingSoon from "./pages/ComingSoon";
 import MensPolo from "./features/productmen/components/MensPolo";
+import WomensPolo from "./features/productmen/components/WomensPolo";
 
 const options = {
   timeout: 5000,
@@ -111,7 +112,7 @@ const router = createBrowserRouter([
       { path: "/men/oversized/:pattern", element: <OversizedMen /> },
       { path: "/women/oversized/:pattern", element: <OversizedWomen /> },
       { path: "/men/polo/:pattern", element: <MensPolo /> },
-      { path: "/women/polo/:pattern", element: <ComingSoon /> },
+      { path: "/women/polo/:pattern", element: <WomensPolo /> },
       { path: "/men/hoodies/crewneck/:pattern", element: <MenHoddiesCreackneak /> },
       { path: "/men/hoodies/oversized/:pattern", element: <MenHoddiesDropShoulder /> },
       { path: "/women/hoodies/oversized/:pattern", element: <WomenHoddiesDropShoulder />, },

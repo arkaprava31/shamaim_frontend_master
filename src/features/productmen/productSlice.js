@@ -8,7 +8,8 @@ import {
   fetchProductsWomenOversized,
   fetchProductsWomencrewneak,
   fetchCategoryProduct,
-  fetchProductPoloMens
+  fetchProductPoloMens,
+  fetchProductsWomensPolo
 } from './productAPI';
 
 const initialState = {
@@ -81,6 +82,14 @@ export const fetchProductsWomenCrewneakAsync = createAsyncThunk(
   'product/fetchProductsWomencrewneak',
   async ({ page }) => {
     const response = await fetchProductsWomencrewneak(page);
+    return response.data;
+  }
+);
+
+export const fetchProductsWomensPoloAsync = createAsyncThunk(
+  'product/fetchProductsWomensPolo',
+  async ({ page }) => {
+    const response = await fetchProductsWomensPolo(page);
     return response.data;
   }
 );

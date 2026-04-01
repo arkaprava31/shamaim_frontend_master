@@ -33,9 +33,9 @@ export default function WomenHoddiesDropShoulder() {
 
   const products = useMemo(() => {
     if (pattern === "solid") {
-      return allProducts.filter((p) => p.genre?.length === 0);
+      return allProducts.filter((p) => p.isSolid === true);
     }
-    return allProducts;
+    return allProducts.filter((p) => !p.isSolid || p.isSolid === false);
   }, [allProducts, pattern]);
 
   const handleImageLoad = (id) => {

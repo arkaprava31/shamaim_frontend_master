@@ -85,6 +85,17 @@ export function fetchProductsWomencrewneak(page) {
   });
 }
 
+export function fetchProductsWomensPolo(page) {
+  return new Promise(async (resolve) => {
+    const response = await fetch(
+      baseUrl + '/products?gender=Female&category=TShirts&subcategory=Polo Tees&' + page
+    );
+    const data = await response.json();
+    const totalItems = await response.headers.get('X-Total-Count');
+    resolve({ data: { products: data, totalItems: +totalItems } });
+  });
+}
+
 export function fetchProductsWomenOversized(page) {
   return new Promise(async (resolve) => {
     const response = await fetch(
