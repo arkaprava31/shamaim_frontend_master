@@ -1,607 +1,381 @@
 import React, { useState } from "react";
-import {
-  Card,
-  CardBody,
-  Typography,
-  Button,
-  Accordion,
-  AccordionHeader,
-  AccordionBody,
-  Chip,
-  Drawer,
-  IconButton,
-} from "@material-tailwind/react";
-import { FiX, FiFilter, FiChevronLeft, FiChevronRight } from "react-icons/fi";
+import { FiX, FiFilter, FiChevronDown, FiSliders } from "react-icons/fi";
+import { Drawer, IconButton } from "@material-tailwind/react";
 
-export default function FilterWrapper({
-  filters = {},
-  onFilterChange,
-  onClearFilters,
-  children,
-}) {
-  const [open, setOpen] = useState({
-    sort: true,
-    color: true,
-    size: true,
-    price: true,
-  });
+const COLORS = ["black", "yellow", "lavender", "camel", "cream white", "grey"];
+const SIZES = ["xs", "s", "m", "l", "xl", "xxl"];
+const GENRE = ["music & band", "anime", "sports", "movies & series", "super hero", "abstract", "drip & doodle"];
+const SORT_OPTIONS = [
+  { label: "Price: Low → High", value: "price-asc" },
+  { label: "Price: High → Low", value: "price-desc" },
+];
 
-  const [sidebarOpen, setSidebarOpen] = useState(false);
-  const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
+// ─── Accordion Section ────────────────────────────────────────────────────────
+function FilterSection({ title, children, defaultOpen = true }) {
+  const [open, setOpen] = useState(defaultOpen);
+  return (
+    <div className="border-b border-gray-100 last:border-0">
+      <button
+        onClick={() => setOpen((o) => !o)}
+        className="w-full flex items-center justify-between py-4 text-left group"
+      >
+        <span className="text-xs font-bold tracking-[0.15em] uppercase text-gray-800 group-hover:text-black transition-colors">
+          {title}
+        </span>
+        <FiChevronDown
+          className={`w-4 h-4 text-gray-400 transition-transform duration-300 ${open ? "rotate-180" : ""}`}
+        />
+      </button>
+      <div
+        className={`overflow-hidden transition-all duration-300 ease-in-out ${
+          open ? "max-h-96 opacity-100 pb-4" : "max-h-0 opacity-0"
+        }`}
+      >
+        {children}
+      </div>
+    </div>
+  );
+}
 
-  const toggle = (key) =>
-    setOpen((prev) => ({ ...prev, [key]: !prev[key] }));
+// ─── Color Swatch ─────────────────────────────────────────────────────────────
+const COLOR_MAP = {
+  black: "#1a1a1a",
+  yellow: "#F5C518",
+  lavender: "#B57BDF",
+  camel: "#C19A6B",
+  "cream white": "#FFF8F0",
+  grey: "#9E9E9E",
+};
 
-  const COLORS = ["black","yellow", "lavender", "camel", "cream white", "grey"];
-  const SIZES = ["xs", "s", "m", "l", "xl","xxl"];
-  const GENRE= ["music & band","anime","sports","movies & series","super hero","abstract","drip & doodle"];
-  // const PRICE_RANGES = [
-  //   { label: "Under ₹500", value: "<500" },
-  //   { label: "₹500 - ₹1000", value: "500-1000" },
-  //   { label: "₹1000 - ₹2000", value: "1000-2000" },
-  // ];
-
-  const SORT_OPTIONS = [
-    { label: "Price: Low → High", value: "price-asc" },
-    { label: "Price: High → Low", value: "price-desc" },
-  ];
-
-  const hasActiveFilters =
-    filters.color?.length ||
-    filters.size?.length ||
-     filters.genre?.length ||
-    filters.sort ||
-    filters.priceRange;
-
-  // Mobile filter drawer
-  const MobileFilterDrawer = () => (
-    <Drawer
-      open={sidebarOpen}
-      onClose={() => setSidebarOpen(false)}
-      className="p-4"
-      placement="left"
-      size={300}
+function ColorSwatch({ color, selected, onClick }) {
+  return (
+    <button
+      onClick={onClick}
+      title={color}
+      className={`relative w-8 h-8 rounded-full transition-all duration-200 ${
+        selected ? "ring-2 ring-offset-2 ring-black scale-110" : "hover:scale-105"
+      }`}
+      style={{
+        backgroundColor: COLOR_MAP[color] || "#ccc",
+        border: color === "cream white" ? "1px solid #e5e7eb" : "none",
+      }}
     >
-      <div className="mb-6 flex items-center justify-between">
-        <Typography variant="h5" color="blue-gray">
-          Filters
-        </Typography>
-        <IconButton
-          variant="text"
-          color="blue-gray"
-          onClick={() => setSidebarOpen(false)}
-        >
-          <FiX className="h-5 w-5" />
-        </IconButton>
+      {selected && (
+        <span className="absolute inset-0 flex items-center justify-center">
+          <svg className="w-3 h-3" viewBox="0 0 12 12" fill="none">
+            <path
+              d="M2 6l3 3 5-5"
+              stroke={color === "yellow" || color === "cream white" ? "#333" : "#fff"}
+              strokeWidth="1.5"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            />
+          </svg>
+        </span>
+      )}
+    </button>
+  );
+}
+
+// ─── Active Filter Pill ───────────────────────────────────────────────────────
+function FilterPill({ label, onRemove }) {
+  return (
+    <span className="inline-flex items-center gap-1.5 px-3 py-1 bg-black text-white text-xs font-medium rounded-full tracking-wide">
+      {label}
+      <button onClick={onRemove} className="hover:opacity-70 transition-opacity mt-px">
+        <FiX className="w-3 h-3" />
+      </button>
+    </span>
+  );
+}
+
+// ─── Sidebar Content (shared between desktop + mobile drawer) ─────────────────
+function SidebarContent({ filters, onFilterChange, onClearFilters, onClose }) {
+  const hasActiveFilters =
+    filters.color?.length || filters.size?.length || filters.genre?.length || filters.sort;
+
+  return (
+    <div className="h-full flex flex-col">
+      {/* Header */}
+      <div className="flex items-center justify-between mb-6 pb-4 border-b border-gray-100">
+        <div className="flex items-center gap-2">
+          <FiSliders className="w-4 h-4 text-gray-600" />
+          <span className="text-sm font-bold tracking-[0.12em] uppercase text-gray-900">
+            Refine
+          </span>
+          {hasActiveFilters ? (
+            <span className="w-5 h-5 bg-black text-white text-[10px] font-bold rounded-full flex items-center justify-center">
+              {[filters.color?.length > 0, filters.size?.length > 0, filters.genre?.length > 0, !!filters.sort].filter(Boolean).length}
+            </span>
+          ) : null}
+        </div>
+        <div className="flex items-center gap-3">
+          {hasActiveFilters && (
+            <button
+              onClick={onClearFilters}
+              className="text-xs text-gray-400 hover:text-black underline underline-offset-2 transition-colors"
+            >
+              Clear all
+            </button>
+          )}
+          {onClose && (
+            <button onClick={onClose} className="text-gray-400 hover:text-black transition-colors">
+              <FiX className="w-5 h-5" />
+            </button>
+          )}
+        </div>
       </div>
 
-      <div className="space-y-6">
-        {/* Mobile SORT */}
-        <div className="border-b pb-4">
-          <Typography variant="h6" className="mb-3">
-            Sort By
-          </Typography>
+      {/* Scrollable filter sections */}
+      <div className="flex-1 overflow-y-auto space-y-0 pr-1 -mr-1">
+
+        {/* Sort */}
+        <FilterSection title="Sort By">
           <div className="space-y-2">
             {SORT_OPTIONS.map((opt) => (
-              <label key={opt.value} className="flex gap-3 items-center">
+              <label
+                key={opt.value}
+                className="flex items-center gap-3 cursor-pointer group"
+              >
+                <span
+                  className={`w-4 h-4 rounded-full border-2 flex items-center justify-center flex-shrink-0 transition-all duration-150 ${
+                    filters.sort === opt.value
+                      ? "border-black bg-black"
+                      : "border-gray-300 group-hover:border-gray-500"
+                  }`}
+                >
+                  {filters.sort === opt.value && (
+                    <span className="w-1.5 h-1.5 rounded-full bg-white" />
+                  )}
+                </span>
                 <input
                   type="radio"
-                  name="sort-mobile"
+                  name="sort"
+                  className="sr-only"
                   checked={filters.sort === opt.value}
-                  onChange={() => {
-                    onFilterChange("sort", opt.value);
-                  }}
-                  className="h-4 w-4"
+                  onChange={() => onFilterChange("sort", opt.value)}
                 />
-                <span className="text-sm">{opt.label}</span>
+                <span
+                  className={`text-sm transition-colors ${
+                    filters.sort === opt.value ? "text-black font-medium" : "text-gray-500 group-hover:text-gray-800"
+                  }`}
+                >
+                  {opt.label}
+                </span>
               </label>
             ))}
           </div>
-        </div>
+        </FilterSection>
 
-        {/* Mobile COLOR */}
-        <div className="border-b pb-4">
-          <Typography variant="h6" className="mb-3">
-            Color
-          </Typography>
-          <div className="flex flex-wrap gap-2">
+        {/* Color */}
+        <FilterSection title="Color">
+          <div className="flex flex-wrap gap-4 mx-2 my-4">
             {COLORS.map((c) => (
-              <Chip
+              <ColorSwatch
                 key={c}
-                value={c}
-                variant={
-                  filters.color?.includes(c) ? "filled" : "outlined"
-                }
+                color={c}
+                selected={filters.color?.includes(c)}
                 onClick={() => {
                   const updated = filters.color?.includes(c)
                     ? filters.color.filter((x) => x !== c)
                     : [...(filters.color || []), c];
                   onFilterChange("color", updated);
                 }}
-                className="cursor-pointer capitalize text-xs"
               />
             ))}
           </div>
-        </div>
-
-        {/* Mobile SIZE */}
-        <div className="border-b pb-4">
-          <Typography variant="h6" className="mb-3">
-            Size
-          </Typography>
-          <div className="flex flex-wrap gap-2">
-            {SIZES.map((s) => (
-              <Chip
-                key={s}
-                value={s.toUpperCase()}
-                variant={
-                  filters.size?.includes(s) ? "filled" : "outlined"
-                }
-                onClick={() => {
-                  const updated = filters.size?.includes(s)
-                    ? filters.size.filter((x) => x !== s)
-                    : [...(filters.size || []), s];
-                  onFilterChange("size", updated);
-                }}
-                className="cursor-pointer text-xs"
-              />
-            ))}
-          </div>
-        </div>
-
-         {/* Mobile Genre */}
-        <div className="border-b pb-4">
-          <Typography variant="h6" className="mb-3">
-            Genre
-          </Typography>
-          <div className="flex flex-wrap gap-2">
-            {GENRE.map((s) => (
-              <Chip
-                key={s}
-                value={s.toUpperCase()}
-                variant={
-                  filters.genre?.includes(s) ? "filled" : "outlined"
-                }
-                onClick={() => {
-                  const updated = filters.genre?.includes(s)
-                    ? filters.genre.filter((x) => x !== s)
-                    : [...(filters.genre || []), s];
-                  onFilterChange("genre", updated);
-                }}
-                className="cursor-pointer text-xs"
-              />
-            ))}
-          </div>
-        </div>
-                  
-
-        {/* Mobile PRICE */}
-        {/* <div className="border-b pb-4">
-          <Typography variant="h6" className="mb-3">
-            Price Range
-          </Typography>
-          <div className="space-y-2">
-            {PRICE_RANGES.map((r) => (
-              <label key={r.value} className="flex gap-3 items-center">
-                <input
-                  type="radio"
-                  name="price-mobile"
-                  checked={filters.priceRange === r.value}
-                  onChange={() =>
-                    onFilterChange("priceRange", r.value)
-                  }
-                  className="h-4 w-4"
-                />
-                <span className="text-sm">{r.label}</span>
-              </label>
-            ))}
-          </div>
-        </div> */}
-
-        <div className="flex gap-3">
-          {hasActiveFilters && (
-            <Button
-              fullWidth
-              variant="outlined"
-              color="red"
-              onClick={() => {
-                onClearFilters();
-                setSidebarOpen(false);
-              }}
-            >
-              Clear All
-            </Button>
+          {filters.color?.length > 0 && (
+            <p className="mt-3 text-xs text-gray-400 capitalize">
+              {filters.color.join(", ")}
+            </p>
           )}
-          <Button
-            fullWidth
-            color="blue"
-            onClick={() => setSidebarOpen(false)}
-          >
-            Apply Filters
-          </Button>
-        </div>
+        </FilterSection>
+
+        {/* Size */}
+        <FilterSection title="Size">
+          <div className="flex flex-wrap gap-2">
+            {SIZES.map((s) => {
+              const selected = filters.size?.includes(s);
+              return (
+                <button
+                  key={s}
+                  onClick={() => {
+                    const updated = selected
+                      ? filters.size.filter((x) => x !== s)
+                      : [...(filters.size || []), s];
+                    onFilterChange("size", updated);
+                  }}
+                  className={`w-12 h-10 text-xs font-semibold tracking-wider uppercase border transition-all duration-150 ${
+                    selected
+                      ? "bg-black text-white border-black"
+                      : "bg-white text-gray-500 border-gray-200 hover:border-gray-800 hover:text-gray-800"
+                  }`}
+                >
+                  {s}
+                </button>
+              );
+            })}
+          </div>
+        </FilterSection>
+
+        {/* Genre */}
+        <FilterSection title="Genre">
+          <div className="space-y-1">
+            {GENRE.map((g) => {
+              const selected = filters.genre?.includes(g);
+              return (
+                <button
+                  key={g}
+                  onClick={() => {
+                    const updated = selected
+                      ? filters.genre.filter((x) => x !== g)
+                      : [...(filters.genre || []), g];
+                    onFilterChange("genre", updated);
+                  }}
+                  className={`w-full text-left px-3 py-2 text-sm rounded transition-all duration-150 capitalize flex items-center justify-between group ${
+                    selected
+                      ? "bg-black text-white"
+                      : "text-gray-600 hover:bg-gray-50 hover:text-gray-900"
+                  }`}
+                >
+                  <span>{g}</span>
+                  {selected && <FiX className="w-3 h-3 opacity-70" />}
+                </button>
+              );
+            })}
+          </div>
+        </FilterSection>
       </div>
-    </Drawer>
+    </div>
   );
+}
+
+// ─── Main FilterWrapper ───────────────────────────────────────────────────────
+export default function FilterWrapper({ filters = {}, onFilterChange, onClearFilters, children }) {
+  const [drawerOpen, setDrawerOpen] = useState(false);
+
+  const hasActiveFilters =
+    filters.color?.length || filters.size?.length || filters.genre?.length || filters.sort;
+
+  const activeCount = [
+    ...(filters.color || []),
+    ...(filters.size || []),
+    ...(filters.genre || []),
+    ...(filters.sort ? [filters.sort] : []),
+  ];
 
   return (
-    <div className="max-w-7xl mx-auto px-4 md:py-10">
-      {/* Mobile Filter Button and Active Filters Bar */}
-      <div className="md:hidden mb-4 my-8 ">
-        <div className="flex items-center justify-between py-3 border-b">
-          <Button
-            variant="outlined"
-            size="sm"
-            className="flex items-center gap-2"
-            onClick={() => setSidebarOpen(true)}
+    <div className="max-w-7xl mx-auto px-4 py-8">
+
+      {/* ── Mobile top bar ── */}
+      <div className="md:hidden mb-5">
+        <div className="flex items-center justify-between py-3 border-y border-gray-100">
+          <button
+            onClick={() => setDrawerOpen(true)}
+            className="flex items-center gap-2 text-sm font-semibold tracking-wide text-gray-700 hover:text-black transition-colors"
           >
-            <FiFilter className="h-4 w-4" />
-            Filters
+            <FiFilter className="w-4 h-4" />
+            Filter & Sort
             {hasActiveFilters && (
-              <span className="bg-blue-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">
-                {Object.values(filters).filter(v => v && (Array.isArray(v) ? v.length > 0 : true)).length}
+              <span className="ml-1 w-5 h-5 bg-black text-white text-[10px] font-bold rounded-full flex items-center justify-center">
+                {activeCount.length}
               </span>
             )}
-          </Button>
-          
+          </button>
+
           {hasActiveFilters && (
-            <Button
-              size="sm"
-              variant="text"
-              color="red"
+            <button
               onClick={onClearFilters}
+              className="text-xs text-gray-400 hover:text-black underline underline-offset-2 transition-colors"
             >
-              Clear All
-            </Button>
+              Clear all
+            </button>
           )}
         </div>
 
-        {/* Active Filters Chips for Mobile */}
+        {/* Active filter pills — mobile */}
         {hasActiveFilters && (
-          <div className="flex flex-wrap gap-2 py-3">
+          <div className="flex flex-wrap gap-2 pt-3">
             {filters.color?.map((c) => (
-              <Chip
+              <FilterPill
                 key={c}
-                value={c}
-                size="sm"
-                variant="filled"
-                onClose={() =>
-                  onFilterChange(
-                    "color",
-                    filters.color.filter((x) => x !== c)
-                  )
-                }
-                className="capitalize"
+                label={c}
+                onRemove={() => onFilterChange("color", filters.color.filter((x) => x !== c))}
               />
             ))}
             {filters.size?.map((s) => (
-              <Chip
+              <FilterPill
                 key={s}
-                value={s.toUpperCase()}
-                size="sm"
-                variant="filled"
-                onClose={() =>
-                  onFilterChange(
-                    "size",
-                    filters.size.filter((x) => x !== s)
-                  )
-                }
+                label={s.toUpperCase()}
+                onRemove={() => onFilterChange("size", filters.size.filter((x) => x !== s))}
               />
             ))}
-            {filters.genre?.map((s) => (
-              <Chip
-                key={s}
-                value={s.toUpperCase()}
-                size="sm"
-                variant="filled"
-                onClose={() =>
-                  onFilterChange(
-                    "genre",
-                    filters.genre.filter((x) => x !== s)
-                  )
-                }
+            {filters.genre?.map((g) => (
+              <FilterPill
+                key={g}
+                label={g}
+                onRemove={() => onFilterChange("genre", filters.genre.filter((x) => x !== g))}
               />
             ))}
             {filters.sort && (
-              <Chip
-                value="Sorted"
-                size="sm"
-                variant="filled"
-                onClose={() => onFilterChange("sort", "")}
+              <FilterPill
+                label={SORT_OPTIONS.find((o) => o.value === filters.sort)?.label || "Sorted"}
+                onRemove={() => onFilterChange("sort", "")}
               />
             )}
-            {/* {filters.priceRange && (
-              <Chip
-                value="Price Range"
-                size="sm"
-                variant="filled"
-                onClose={() => onFilterChange("priceRange", "")}
-              />
-            )} */}
           </div>
         )}
       </div>
 
-      <div className="flex gap-6 relative">
-        {/* Sidebar Toggle Button for Desktop */}
-        {/*  */}
+      {/* ── Layout ── */}
+      <div className="flex gap-8">
 
-        {/* SIDEBAR - Desktop */}
-        {!sidebarCollapsed && (
-          <aside className="hidden md:block w-72 shrink-0 transition-all duration-300 ">
-            <Card className="sticky top-24">
-              <CardBody className="space-y-6">
-                <div className="flex justify-between items-center">
-                  <Typography variant="h5" className="font-bold">
-                    Filters
-                  </Typography>
-                  {hasActiveFilters && (
-                    <Button
-                      size="sm"
-                      variant="text"
-                      color="red"
-                      onClick={onClearFilters}
-                    >
-                      Clear All
-                    </Button>
-                  )}
-                </div>
+        {/* Desktop sidebar */}
+        <aside className="hidden md:block w-64 shrink-0">
+          <div className="sticky top-24 bg-white border border-gray-100 rounded-lg p-5 shadow-sm">
+            <SidebarContent
+              filters={filters}
+              onFilterChange={onFilterChange}
+              onClearFilters={onClearFilters}
+            />
+          </div>
+        </aside>
 
-                {/* SORT */}
-                <div className="border rounded-lg overflow-hidden">
-                  <Accordion open={open.sort}>
-                    <AccordionHeader
-                      onClick={() => toggle("sort")}
-                      className="px-4 py-3 border-b hover:bg-gray-50"
-                    >
-                      <Typography className="font-semibold">
-                        Sort By
-                      </Typography>
-                    </AccordionHeader>
-                    <AccordionBody className="p-4 space-y-3">
-                      {SORT_OPTIONS.map((opt) => (
-                        <label
-                          key={opt.value}
-                          className="flex gap-3 items-center cursor-pointer hover:bg-gray-50 p-2 rounded"
-                        >
-                          <input
-                            type="radio"
-                            name="sort"
-                            checked={filters.sort === opt.value}
-                            onChange={() =>
-                              onFilterChange("sort", opt.value)
-                            }
-                            className="h-4 w-4 text-blue-600"
-                          />
-                          <span className="text-sm">{opt.label}</span>
-                        </label>
-                      ))}
-                    </AccordionBody>
-                  </Accordion>
-                </div>
-
-                {/* COLOR */}
-                <div className="border rounded-lg overflow-hidden">
-                  <Accordion open={open.color}>
-                    <AccordionHeader
-                      onClick={() => toggle("color")}
-                      className="px-4 py-3 border-b hover:bg-gray-50"
-                    >
-                      <Typography className="font-semibold">
-                        Color
-                      </Typography>
-                    </AccordionHeader>
-                    <AccordionBody className="p-4">
-                      <div className="flex flex-wrap gap-2">
-                        {COLORS.map((c) => (
-                          <Chip
-                            key={c}
-                            value={c}
-                            variant={
-                              filters.color?.includes(c)
-                                ? "filled"
-                                : "outlined"
-                            }
-                            color={
-                              filters.color?.includes(c) ? "blue" : "gray"
-                            }
-                            onClick={() => {
-                              const updated = filters.color?.includes(c)
-                                ? filters.color.filter((x) => x !== c)
-                                : [...(filters.color || []), c];
-                              onFilterChange("color", updated);
-                            }}
-                            className="cursor-pointer capitalize hover:shadow-md transition-shadow"
-                          />
-                        ))}
-                      </div>
-                    </AccordionBody>
-                  </Accordion>
-                </div>
-
-                {/* SIZE */}
-                <div className="border rounded-lg overflow-hidden">
-                  <Accordion open={open.size}>
-                    <AccordionHeader
-                      onClick={() => toggle("size")}
-                      className="px-4 py-3 border-b hover:bg-gray-50"
-                    >
-                      <Typography className="font-semibold">
-                        Size
-                      </Typography>
-                    </AccordionHeader>
-                    <AccordionBody className="p-4">
-                      <div className="flex flex-wrap gap-2">
-                        {SIZES.map((s) => (
-                          <Chip
-                            key={s}
-                            value={s.toUpperCase()}
-                            variant={
-                              filters.size?.includes(s)
-                                ? "filled"
-                                : "outlined"
-                            }
-                            color={
-                              filters.size?.includes(s) ? "blue" : "gray"
-                            }
-                            onClick={() => {
-                              const updated = filters.size?.includes(s)
-                                ? filters.size.filter((x) => x !== s)
-                                : [...(filters.size || []), s];
-                              onFilterChange("size", updated);
-                            }}
-                            className="cursor-pointer hover:shadow-md transition-shadow"
-                          />
-                        ))}
-                      </div>
-                    </AccordionBody>
-                  </Accordion>
-                </div>
-
-                {/* GENRE */}
-                 <div className="border rounded-lg overflow-hidden">
-                  <Accordion open={open.size}>
-                    <AccordionHeader
-                      onClick={() => toggle("size")}
-                      className="px-4 py-3 border-b hover:bg-gray-50"
-                    >
-                      <Typography className="font-semibold">
-                        Genre
-                      </Typography>
-                    </AccordionHeader>
-                    <AccordionBody className="p-4">
-                      <div className="flex flex-wrap gap-2">
-                        {GENRE.map((s) => (
-                          <Chip
-                            key={s}
-                            value={s.toUpperCase()}
-                            variant={
-                              filters.genre?.includes(s)
-                                ? "filled"
-                                : "outlined"
-                            }
-                            color={
-                              filters.genre?.includes(s) ? "blue" : "gray"
-                            }
-                            onClick={() => {
-                              const updated = filters.genre?.includes(s)
-                                ? filters.genre.filter((x) => x !== s)
-                                : [...(filters.genre || []), s];
-                              onFilterChange("genre", updated);
-                            }}
-                            className="cursor-pointer hover:shadow-md transition-shadow"
-                          />
-                        ))}
-                      </div>
-                    </AccordionBody>
-                  </Accordion>
-                </div>
-                          
-
-                {/* PRICE */}
-                {/* <div className="border rounded-lg overflow-hidden">
-                  <Accordion open={open.price}>
-                    <AccordionHeader
-                      onClick={() => toggle("price")}
-                      className="px-4 py-3 border-b hover:bg-gray-50"
-                    >
-                      <Typography className="font-semibold">
-                        Price Range
-                      </Typography>
-                    </AccordionHeader>
-                    <AccordionBody className="p-4 space-y-3">
-                      {PRICE_RANGES.map((r) => (
-                        <label
-                          key={r.value}
-                          className="flex gap-3 items-center cursor-pointer hover:bg-gray-50 p-2 rounded"
-                        >
-                          <input
-                            type="radio"
-                            name="price"
-                            checked={filters.priceRange === r.value}
-                            onChange={() =>
-                              onFilterChange("priceRange", r.value)
-                            }
-                            className="h-4 w-4 text-blue-600"
-                          />
-                          <span className="text-sm">{r.label}</span>
-                        </label>
-                      ))}
-                    </AccordionBody>
-                  </Accordion>
-                </div> */}
-              </CardBody>
-            </Card>
-          </aside>
-        )}
-
-        {/* MAIN CONTENT */}
-        <main className={`flex-1 transition-all duration-300 ${sidebarCollapsed ? 'md:ml-0' : ''}`}>
-          {/* Active Filters Chips for Desktop */}
+        {/* Main content */}
+        <main className="flex-1 min-w-0">
+          {/* Active filter pills — desktop */}
           {hasActiveFilters && (
-            <div className="hidden md:flex flex-wrap gap-2 mb-6 p-4 bg-gray-50 rounded-lg">
-              <Typography variant="small" className="font-semibold mr-2">
-                Active Filters:
-              </Typography>
+            <div className="hidden md:flex flex-wrap items-center gap-2 mb-6 pb-4 border-b border-gray-100">
+              <span className="text-xs font-bold tracking-widest uppercase text-gray-400 mr-1">
+                Active:
+              </span>
               {filters.color?.map((c) => (
-                <Chip
+                <FilterPill
                   key={c}
-                  value={c}
-                  variant="filled"
-                  color="blue"
-                  onClose={() =>
-                    onFilterChange(
-                      "color",
-                      filters.color.filter((x) => x !== c)
-                    )
-                  }
-                  className="capitalize"
+                  label={c}
+                  onRemove={() => onFilterChange("color", filters.color.filter((x) => x !== c))}
                 />
               ))}
               {filters.size?.map((s) => (
-                <Chip
+                <FilterPill
                   key={s}
-                  value={s.toUpperCase()}
-                  variant="filled"
-                  color="blue"
-                  onClose={() =>
-                    onFilterChange(
-                      "size",
-                      filters.size.filter((x) => x !== s)
-                    )
-                  }
+                  label={s.toUpperCase()}
+                  onRemove={() => onFilterChange("size", filters.size.filter((x) => x !== s))}
                 />
               ))}
               {filters.genre?.map((g) => (
-                <Chip
+                <FilterPill
                   key={g}
-                  value={g.toUpperCase()}
-                  variant="filled"
-                  color="blue"
-                  onClose={() =>
-                    onFilterChange(
-                      "genre",
-                      filters.genre.filter((x) => x !== g)
-                    )
-                  }
+                  label={g}
+                  onRemove={() => onFilterChange("genre", filters.genre.filter((x) => x !== g))}
                 />
               ))}
               {filters.sort && (
-                <Chip
-                  value={`Sort: ${SORT_OPTIONS.find(o => o.value === filters.sort)?.label || 'Sorted'}`}
-                  variant="filled"
-                  color="blue"
-                  onClose={() => onFilterChange("sort", "")}
+                <FilterPill
+                  label={SORT_OPTIONS.find((o) => o.value === filters.sort)?.label || "Sorted"}
+                  onRemove={() => onFilterChange("sort", "")}
                 />
               )}
-              {/* {filters.priceRange && (
-                <Chip
-                  value={`Price: ${PRICE_RANGES.find(p => p.value === filters.priceRange)?.label || 'Range'}`}
-                  variant="filled"
-                  color="blue"
-                  onClose={() => onFilterChange("priceRange", "")}
-                />
-              )} */}
             </div>
           )}
 
@@ -609,8 +383,22 @@ export default function FilterWrapper({
         </main>
       </div>
 
-      {/* Mobile Filter Drawer */}
-      <MobileFilterDrawer />
+      {/* Mobile drawer */}
+      <Drawer
+        open={drawerOpen}
+        onClose={() => setDrawerOpen(false)}
+        placement="left"
+        size={300}
+        className="p-5"
+        overlay
+      >
+        <SidebarContent
+          filters={filters}
+          onFilterChange={onFilterChange}
+          onClearFilters={() => { onClearFilters(); setDrawerOpen(false); }}
+          onClose={() => setDrawerOpen(false)}
+        />
+      </Drawer>
     </div>
   );
 }

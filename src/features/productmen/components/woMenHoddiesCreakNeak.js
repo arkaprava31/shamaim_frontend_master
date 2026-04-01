@@ -1,85 +1,42 @@
-import React, { useEffect, useState, useRef } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { fetchCategoryProductAsync } from "../productSlice";
-import { useDispatch } from "react-redux";
 import { Link, useParams } from "react-router-dom";
+import { useProductFilter } from "../../../hooks/useProductFilter";
+import FilterWrapper from "../../../pages/filter/filterWrapper";
+import { MEN_FILTER_CONFIG } from "../../../config/filterConfig";
 
 export default function WomenHoddiesCreackneak() {
-  const [products, setProducts] = useState([]);
   const [loadedImages, setLoadedImages] = useState({});
-  const [page, setPage] = useState(1);
-  const [loading, setLoading] = useState(false);
-  const [initialLoading, setInitialLoading] = useState(true);
-  const [hasMore, setHasMore] = useState(true);
   const [bannerLoading, setBannerLoading] = useState(true);
-  const [error, setError] = useState(null);
 
-  const loader = useRef(null);
-  const dispatch = useDispatch();
   const { pattern } = useParams();
-
-  const subcategories = "Classic Fit";
-  const gender = "Female";
 
   useEffect(() => {
     window.scrollTo(0, 0);
   }, []);
 
-  const fetchProducts = async () => {
-    if (loading || !hasMore) return;
+  const {
+    products: allProducts,
+    loading,
+    error,
+    hasMore,
+    loaderRef,
+    filters,
+    handleFilterChange,
+    handleClearFilters,
+  } = useProductFilter(
+    fetchCategoryProductAsync,
+    { subcategories: "Classic Fit", gender: "Female" }
+  );
 
-    setLoading(true);
+  const initialLoading = loading && allProducts.length === 0;
 
-    try {
-      const res = await dispatch(
-        fetchCategoryProductAsync({ page, subcategories, gender })
-      ).unwrap();
-
-      let newProducts = res?.products?.docs || [];
-
-      if (pattern === "solid") {
-        newProducts = newProducts.filter((p) => p.genre?.length === 0);
-      }
-
-      if (newProducts.length === 0) {
-        setHasMore(false);
-      }
-
-      setProducts((prev) => [...prev, ...newProducts]);
-    } catch (err) {
-      setError("Error while fetching the data");
+  const products = useMemo(() => {
+    if (pattern === "solid") {
+      return allProducts.filter((p) => p.genre?.length === 0);
     }
-
-    setLoading(false);
-    setInitialLoading(false);
-  };
-
-  useEffect(() => {
-    fetchProducts();
-  }, [page]);
-
-  useEffect(() => {
-    setProducts([]);
-    setLoadedImages({});
-    setPage(1);
-    setHasMore(true);
-    setInitialLoading(true);
-    setBannerLoading(true);
-  }, [pattern]);
-
-  useEffect(() => {
-    const observer = new IntersectionObserver(
-      (entries) => {
-        if (entries[0].isIntersecting && !loading && hasMore) {
-          setPage((prev) => prev + 1);
-        }
-      },
-      { rootMargin: "200px" }
-    );
-
-    if (loader.current) observer.observe(loader.current);
-
-    return () => observer.disconnect();
-  }, [loading, hasMore]);
+    return allProducts;
+  }, [allProducts, pattern]);
 
   const handleImageLoad = (id) => {
     setLoadedImages((prev) => ({ ...prev, [id]: true }));
@@ -87,14 +44,13 @@ export default function WomenHoddiesCreackneak() {
 
   return (
     <>
+      {/* Banner — full width, outside FilterWrapper */}
       <div className="h-full relative">
-
         {bannerLoading && (
           <div className="w-full h-[200px] md:h-[350px] bg-gray-200 animate-pulse flex items-center justify-center">
             <p className="text-gray-500 text-sm">Loading banner...</p>
           </div>
         )}
-
         <img
           src="https://firebasestorage.googleapis.com/v0/b/shamaim-lifestyle.appspot.com/o/Category%20wallpepar%2FCLASSIC%20WOMEN.jpg?alt=media&token=1cc64524-9377-4810-89af-fad7a491c7a6"
           onLoad={() => setBannerLoading(false)}
@@ -102,113 +58,107 @@ export default function WomenHoddiesCreackneak() {
         />
       </div>
 
-      {error && <p className="text-center text-red-500">{error}</p>}
+      {/* Filter sidebar + product grid */}
+      <FilterWrapper
+        filters={filters}
+        onFilterChange={handleFilterChange}
+        onClearFilters={handleClearFilters}
+        filterConfig={MEN_FILTER_CONFIG}
+      >
+        {error && <p className="text-center text-red-500 mb-4">{error}</p>}
 
-      {(initialLoading || products.length !== 0) && (
-        <div className="w-full flex justify-center mt-6">
-          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-5 md:gap-8 p-4 w-full md:w-[80%] font-poppins">
+        {(initialLoading || products.length !== 0) && (
+          <div className="w-full flex justify-center mt-6">
+            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-5 md:gap-8 p-4 w-full font-poppins">
 
-            {initialLoading &&
-              [...Array(8)].map((_, i) => (
-                <div
-                  key={i}
-                  className="bg-white rounded-2xl border border-gray-100 overflow-hidden"
-                >
-                  <div className="w-full h-52 md:h-64 bg-gray-200 animate-pulse"></div>
-
-                  <div className="p-3 space-y-2">
-                    <div className="h-3 bg-gray-200 rounded animate-pulse w-16"></div>
-                    <div className="h-4 bg-gray-200 rounded animate-pulse w-full"></div>
-                    <div className="h-4 bg-gray-200 rounded animate-pulse w-24"></div>
-                  </div>
-                </div>
-              ))}
-
-            {products.map((product) => {
-              const discountedPrice = Math.floor(
-                product.price -
-                  product.price * (product.discountPercentage / 100)
-              );
-
-              return (
-                <Link
-                  to={`/product-detail/${product.id}`}
-                  key={product.id}
-                  className="group bg-white rounded-2xl border border-gray-100 overflow-hidden 
-                hover:shadow-xl hover:-translate-y-1 transition-all duration-300"
-                >
-                  <div className="relative overflow-hidden">
-
-                    {!loadedImages[product.id] && (
-                      <div className="absolute inset-0 bg-gray-200 animate-pulse"></div>
-                    )}
-
-                    <img
-                      src={product.thumbnail}
-                      alt={product.title}
-                      loading="lazy"
-                      onLoad={() => handleImageLoad(product.id)}
-                      className={`w-full h-52 md:h-64 object-cover group-hover:scale-105 transition duration-300 ${
-                        loadedImages[product.id] ? "opacity-100" : "opacity-0"
-                      }`}
-                    />
-
-                    {product.discountPercentage > 0 && (
-                      <span className="absolute top-3 left-3 bg-red-500 text-white text-xs px-2 py-1 rounded-md">
-                        {Math.round(product.discountPercentage)}% OFF
-                      </span>
-                    )}
-                  </div>
-
-                  <div className="p-3 flex flex-col gap-1">
-                    <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide">
-                      Shamaim
-                    </p>
-
-                    <p className="text-sm text-gray-700 font-medium line-clamp-2">
-                      {product.AboutTheDesign?.slice(0, 45)}...
-                    </p>
-
-                    <div className="flex items-center gap-2 mt-1">
-                      <p className="text-sm font-semibold text-gray-900">
-                        ₹{discountedPrice}
-                      </p>
-
-                      <p className="text-xs text-gray-400 line-through">
-                        ₹{product.price}
-                      </p>
+              {/* Initial skeleton */}
+              {initialLoading &&
+                [...Array(8)].map((_, i) => (
+                  <div key={i} className="bg-white rounded-2xl border border-gray-100 overflow-hidden">
+                    <div className="w-full h-52 md:h-64 bg-gray-200 animate-pulse"></div>
+                    <div className="p-3 space-y-2">
+                      <div className="h-3 bg-gray-200 rounded animate-pulse w-16"></div>
+                      <div className="h-4 bg-gray-200 rounded animate-pulse w-full"></div>
+                      <div className="h-4 bg-gray-200 rounded animate-pulse w-24"></div>
                     </div>
                   </div>
-                </Link>
-              );
-            })}
+                ))}
 
-            {loading &&
-              [...Array(4)].map((_, i) => (
-                <div
-                  key={"loading" + i}
-                  className="bg-white rounded-2xl border border-gray-100 overflow-hidden"
-                >
-                  <div className="w-full h-52 md:h-64 bg-gray-200 animate-pulse"></div>
+              {/* Product cards — unchanged */}
+              {products.map((product) => {
+                const discountedPrice = Math.floor(
+                  product.price - product.price * (product.discountPercentage / 100)
+                );
 
-                  <div className="p-3 space-y-2">
-                    <div className="h-3 bg-gray-200 rounded animate-pulse w-16"></div>
-                    <div className="h-4 bg-gray-200 rounded animate-pulse w-full"></div>
-                    <div className="h-4 bg-gray-200 rounded animate-pulse w-24"></div>
+                return (
+                  <Link
+                    to={`/product-detail/${product.id}`}
+                    key={product.id}
+                    className="group bg-white rounded-2xl border border-gray-100 overflow-hidden 
+                    hover:shadow-xl hover:-translate-y-1 transition-all duration-300"
+                  >
+                    <div className="relative overflow-hidden">
+                      {!loadedImages[product.id] && (
+                        <div className="absolute inset-0 bg-gray-200 animate-pulse"></div>
+                      )}
+                      <img
+                        src={product.thumbnail}
+                        alt={product.title}
+                        loading="lazy"
+                        onLoad={() => handleImageLoad(product.id)}
+                        className={`w-full h-52 md:h-64 object-cover group-hover:scale-105 transition duration-300 ${
+                          loadedImages[product.id] ? "opacity-100" : "opacity-0"
+                        }`}
+                      />
+                      {product.discountPercentage > 0 && (
+                        <span className="absolute top-3 left-3 bg-red-500 text-white text-xs px-2 py-1 rounded-md">
+                          {Math.round(product.discountPercentage)}% OFF
+                        </span>
+                      )}
+                    </div>
+
+                    <div className="p-3 flex flex-col gap-1">
+                      <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide">
+                        Shamaim
+                      </p>
+                      <p className="text-sm text-gray-700 font-medium line-clamp-2">
+                        {product.AboutTheDesign?.slice(0, 45)}...
+                      </p>
+                      <div className="flex items-center gap-2 mt-1">
+                        <p className="text-sm font-semibold text-gray-900">₹{discountedPrice}</p>
+                        <p className="text-xs text-gray-400 line-through">₹{product.price}</p>
+                      </div>
+                    </div>
+                  </Link>
+                );
+              })}
+
+              {/* Load-more skeleton */}
+              {loading && !initialLoading &&
+                [...Array(4)].map((_, i) => (
+                  <div key={"loading" + i} className="bg-white rounded-2xl border border-gray-100 overflow-hidden">
+                    <div className="w-full h-52 md:h-64 bg-gray-200 animate-pulse"></div>
+                    <div className="p-3 space-y-2">
+                      <div className="h-3 bg-gray-200 rounded animate-pulse w-16"></div>
+                      <div className="h-4 bg-gray-200 rounded animate-pulse w-full"></div>
+                      <div className="h-4 bg-gray-200 rounded animate-pulse w-24"></div>
+                    </div>
                   </div>
-                </div>
-              ))}
+                ))}
+            </div>
           </div>
-        </div>
-      )}
+        )}
 
-      {!initialLoading && products.length === 0 && (
-        <div className="w-full text-center text-sm text-gray-700 py-8">
-          No products found.
-        </div>
-      )}
+        {/* Empty state */}
+        {!initialLoading && products.length === 0 && (
+          <div className="w-full text-center text-sm text-gray-700 py-8">
+            No products found.
+          </div>
+        )}
 
-      <div ref={loader}></div>
+        {/* Infinite scroll trigger */}
+        <div ref={loaderRef}></div>
+      </FilterWrapper>
     </>
   );
 }
