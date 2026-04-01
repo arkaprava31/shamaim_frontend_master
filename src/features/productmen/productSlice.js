@@ -7,7 +7,8 @@ import {
   fetchProductByCrewneak,
   fetchProductsWomenOversized,
   fetchProductsWomencrewneak,
-  fetchCategoryProduct
+  fetchCategoryProduct,
+  fetchProductPoloMens
 } from './productAPI';
 
 const initialState = {
@@ -19,30 +20,34 @@ const initialState = {
   selectedProduct: null,
 };
 
-
-
-
 export const fetchProductCrewNeakAsync = createAsyncThunk(
   'product/fetchProductByCrewneak',
-  async ({ page}) => {
-    const response = await  fetchProductByCrewneak( page);
+  async ({ page }) => {
+    const response = await fetchProductByCrewneak(page);
+    return response.data;
+  }
+);
+
+export const fetchProductPoloMensAsync = createAsyncThunk(
+  'product/fetchProductPoloMens',
+  async ({ page }) => {
+    const response = await fetchProductPoloMens(page);
     return response.data;
   }
 );
 
 export const fetchCategoryProductAsync = createAsyncThunk(
   'product/fetchCategoryProduct',
-  async ({ page,subcategories,gender}) => {
-    const response = await  fetchCategoryProduct( page,subcategories,gender);
+  async ({ page, subcategories, gender }) => {
+    const response = await fetchCategoryProduct(page, subcategories, gender);
     return response.data;
   }
 );
 
 
-
 export const fetchProductsByFiltersAsync = createAsyncThunk(
   'product/fetchProductsByFilters',
-  async ({page}) => {
+  async ({ page }) => {
     const response = await fetchProductsByFilters(page);
     return response.data;
   }
@@ -50,7 +55,7 @@ export const fetchProductsByFiltersAsync = createAsyncThunk(
 
 export const fetchProductsWomenAsync = createAsyncThunk(
   'product/fetchProductsWomen',
-  async ({ page}) => {
+  async ({ page }) => {
     const response = await fetchProductsWomen(page);
     return response.data;
   }
@@ -59,7 +64,7 @@ export const fetchProductsWomenAsync = createAsyncThunk(
 
 export const fetchProductsOversizedAsync = createAsyncThunk(
   'product/fetchProductsOversized',
-  async ({ page}) => {
+  async ({ page }) => {
     const response = await fetchProductsOversized(page);
     return response.data;
   }
@@ -92,9 +97,9 @@ export const fetchCategoriesAsync = createAsyncThunk(
 export const productSlice = createSlice({
   name: 'product',
   initialState,
-  
+
   reducers: {
-    clearSelectedProduct:(state)=>{
+    clearSelectedProduct: (state) => {
       state.selectedProduct = null
     }
   },
@@ -109,16 +114,16 @@ export const productSlice = createSlice({
         state.totalItems = action.payload.totalItems;
       })
 
-      .addCase(  fetchProductCrewNeakAsync
+      .addCase(fetchProductCrewNeakAsync
         .pending, (state) => {
-        state.status = 'loading';
-      })
-      .addCase(  fetchProductCrewNeakAsync
+          state.status = 'loading';
+        })
+      .addCase(fetchProductCrewNeakAsync
         .fulfilled, (state, action) => {
-        state.status = 'idle';
-        state.products = action.payload.products;
-        state.totalItems = action.payload.totalItems;
-      })
+          state.status = 'idle';
+          state.products = action.payload.products;
+          state.totalItems = action.payload.totalItems;
+        })
       .addCase(fetchProductsWomenAsync.pending, (state) => {
         state.status = 'loading';
       })
@@ -139,7 +144,7 @@ export const productSlice = createSlice({
       .addCase(fetchProductsOversizedAsync.pending, (state) => {
         state.status = 'loading';
       })
-      
+
       .addCase(fetchProductsOversizedAsync.fulfilled, (state, action) => {
         state.status = 'idle';
         state.products = action.payload.products;
@@ -168,9 +173,9 @@ export const productSlice = createSlice({
         state.status = 'idle';
         state.categories = action.payload;
       })
-   
-    
-     
+
+
+
   },
 });
 

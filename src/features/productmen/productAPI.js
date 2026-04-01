@@ -2,17 +2,17 @@ import { baseUrl } from "../../app/constants";
 export function fetchProductsByFilters(page) {
   return new Promise(async (resolve) => {
     const response = await fetch(
-      baseUrl+`/products?gender=men&pages=${page}` 
+      baseUrl + `/products?gender=men&pages=${page}`
     );
     const data = await response.json();
     const totalItems = await response.headers.get('X-Total-Count');
-    resolve({ data: {products: data, totalItems: +totalItems } });
+    resolve({ data: { products: data, totalItems: +totalItems } });
   });
 }
 
 export function fetchCategories() {
   return new Promise(async (resolve) => {
-    const response = await fetch(baseUrl+'/categories');
+    const response = await fetch(baseUrl + '/categories');
     const data = await response.json();
     resolve({ data });
   });
@@ -21,7 +21,7 @@ export function fetchCategories() {
 export function fetchProductsOversized(page) {
   return new Promise(async (resolve) => {
     const response = await fetch(
-      baseUrl+'/products?gender=Male&category=TShirts&subcategory=Drop Shoulder&' + page
+      baseUrl + '/products?gender=Male&category=TShirts&subcategory=Drop Shoulder&' + page
     );
     const data = await response.json();
     const totalItems = await response.headers.get('X-Total-Count');
@@ -32,7 +32,7 @@ export function fetchProductsOversized(page) {
 export function fetchProductsWomen(page) {
   return new Promise(async (resolve) => {
     const response = await fetch(
-      baseUrl+'/products?gender=Female&' + page
+      baseUrl + '/products?gender=Female&' + page
     );
     const data = await response.json();
     const totalItems = await response.headers.get('X-Total-Count');
@@ -40,10 +40,10 @@ export function fetchProductsWomen(page) {
   });
 }
 
-export function fetchProductByCrewneak( page) {
+export function fetchProductByCrewneak(page) {
   return new Promise(async (resolve) => {
     const response = await fetch(
-      baseUrl+'/products?gender=Male&category=TShirts&subcategory=Classic Fit&' + page
+      baseUrl + '/products?gender=Male&category=TShirts&subcategory=Classic Fit&' + page
     );
     const data = await response.json();
     const totalItems = await response.headers.get('X-Total-Count');
@@ -51,10 +51,21 @@ export function fetchProductByCrewneak( page) {
   });
 }
 
-export function fetchCategoryProduct( pages,subcategories,gender) {
+export function fetchProductPoloMens(page) {
   return new Promise(async (resolve) => {
     const response = await fetch(
-      baseUrl+`/products?gender=${gender}&subcategory=${subcategories}&category=Hoodies&pages=${pages}` 
+      baseUrl + '/products?gender=Male&category=TShirts&subcategory=Polo Tees&' + page
+    );
+    const data = await response.json();
+    const totalItems = await response.headers.get('X-Total-Count');
+    resolve({ data: { products: data, totalItems: +totalItems } });
+  });
+}
+
+export function fetchCategoryProduct(pages, subcategories, gender) {
+  return new Promise(async (resolve) => {
+    const response = await fetch(
+      baseUrl + `/products?gender=${gender}&subcategory=${subcategories}&category=Hoodies&pages=${pages}`
     );
     const data = await response.json();
     const totalItems = await response.headers.get('X-Total-Count');
@@ -66,7 +77,7 @@ export function fetchCategoryProduct( pages,subcategories,gender) {
 export function fetchProductsWomencrewneak(page) {
   return new Promise(async (resolve) => {
     const response = await fetch(
-      baseUrl+'/products?gender=Female&category=TShirts&subcategory=Classic Fit&' + page
+      baseUrl + '/products?gender=Female&category=TShirts&subcategory=Classic Fit&' + page
     );
     const data = await response.json();
     const totalItems = await response.headers.get('X-Total-Count');
@@ -77,7 +88,7 @@ export function fetchProductsWomencrewneak(page) {
 export function fetchProductsWomenOversized(page) {
   return new Promise(async (resolve) => {
     const response = await fetch(
-      baseUrl+'/products?gender=Female&category=TShirts&subcategory=Drop Shoulder&' + page
+      baseUrl + '/products?gender=Female&category=TShirts&subcategory=Drop Shoulder&' + page
     );
     const data = await response.json();
     const totalItems = await response.headers.get('X-Total-Count');
