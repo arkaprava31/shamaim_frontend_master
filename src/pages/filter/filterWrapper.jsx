@@ -101,7 +101,7 @@ function SidebarContent({ filters, onFilterChange, onClearFilters, onClose }) {
         <div className="flex items-center gap-2">
           <FiSliders className="w-4 h-4 text-gray-600" />
           <span className="text-sm font-bold tracking-[0.12em] uppercase text-gray-900">
-            Refine
+            SHAMAIM
           </span>
           {hasActiveFilters ? (
             <span className="w-5 h-5 bg-black text-white text-[10px] font-bold rounded-full flex items-center justify-center">

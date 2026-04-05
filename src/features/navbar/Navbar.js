@@ -74,7 +74,7 @@ function NavBar({ children }) {
   return (
     <>
       <div className="h-full py-7">
-        <div className="fixed flex justify-between items-center w-full h-[9vh] bg-white shadow top-0 left-0  z-10 ">
+        <div className="fixed flex justify-between items-center w-full h-[9vh] bg-white shadow top-0 left-0 z-10 ">
           <div className="flex justify-evenly items-center w-[40vw] md:3-2/4 h-[10vh]">
             <div>
               {showButton ? (

@@ -38,18 +38,34 @@ export default function CrewneckProduct() {
   return (
     <>
       {/* Banner — outside FilterWrapper so it stays full width */}
-      <div className="h-full relative">
+      <div className="h-full relative mt-1">
         {bannerLoading && (
-          <div className="w-full h-[200px] md:h-[350px] bg-gray-200 animate-pulse flex items-center justify-center">
-            <p className="text-gray-500 text-sm">Loading banner...</p>
+          <div className="w-full h-[475px] md:h-[350px] bg-gray-100 flex items-center justify-center">
+            <p className="text-gray-400 text-sm animate-pulse">
+              Loading banner...
+            </p>
           </div>
         )}
-        <img
-          src="https://firebasestorage.googleapis.com/v0/b/shamaim-lifestyle.appspot.com/o/Category%20wallpepar%2FMen%20Crewneck.png?alt=media&token=c7e0cf86-b491-4d7f-be59-b2cd32849c11"
-          alt="Crewneck"
-          onLoad={() => setBannerLoading(false)}
-          className={`${bannerLoading ? "hidden" : "block"}`}
-        />
+        <picture>
+          <source
+            media="(max-width: 768px)"
+            srcSet={
+              pattern === "solid"
+                ? "https://firebasestorage.googleapis.com/v0/b/shamaim-lifestyle.appspot.com/o/Category%20wallpepar%2FMen%20Crewneck.png?alt=media&token=c7e0cf86-b491-4d7f-be59-b2cd32849c11"
+                : "https://firebasestorage.googleapis.com/v0/b/shamaim-lifestyle.appspot.com/o/Category%20wallpepar%2FMen%20Crewneck.png?alt=media&token=c7e0cf86-b491-4d7f-be59-b2cd32849c11"
+            }
+          />
+          <img
+            src={
+              pattern === "solid"
+                ? "https://firebasestorage.googleapis.com/v0/b/shamaim-lifestyle.appspot.com/o/Category%20wallpepar%2FMen%20Crewneck.png?alt=media&token=c7e0cf86-b491-4d7f-be59-b2cd32849c11"
+                : "https://firebasestorage.googleapis.com/v0/b/shamaim-lifestyle.appspot.com/o/Category%20wallpepar%2FMen%20Crewneck.png?alt=media&token=c7e0cf86-b491-4d7f-be59-b2cd32849c11"
+            }
+            alt="Mens Crewneck Tees"
+            onLoad={() => setBannerLoading(false)}
+            className={`${bannerLoading ? "hidden" : "block"} w-full`}
+          />
+        </picture>
       </div>
 
       {/* FilterWrapper wraps only the grid */}

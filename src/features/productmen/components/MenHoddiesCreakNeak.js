@@ -46,18 +46,34 @@ export default function MenHoddiesCreackneak() {
   return (
     <>
       {/* Banner — full width, outside FilterWrapper */}
-      <div className="w-full relative">
+      <div className="h-full relative mt-1">
         {bannerLoading && (
-          <div className="w-full h-[200px] md:h-[350px] bg-gray-200 animate-pulse flex items-center justify-center">
-            <p className="text-gray-500 text-sm">Loading banner...</p>
+          <div className="w-full h-[475px] md:h-[350px] bg-gray-100 flex items-center justify-center">
+            <p className="text-gray-400 text-sm animate-pulse">
+              Loading banner...
+            </p>
           </div>
         )}
-        <img
-          src="https://firebasestorage.googleapis.com/v0/b/shamaim-lifestyle.appspot.com/o/Category%20wallpepar%2Fmen%20crewneck.jpg?alt=media&token=1b96b61c-601d-4da0-9ead-afc351c26952"
-          alt="Men Crewneck"
-          className={`w-full object-cover ${bannerLoading ? "hidden" : "block"}`}
-          onLoad={() => setBannerLoading(false)}
-        />
+        <picture>
+          <source
+            media="(max-width: 768px)"
+            srcSet={
+              pattern === "solid"
+                ? "https://firebasestorage.googleapis.com/v0/b/shamaim-lifestyle.appspot.com/o/Category%20wallpepar%2Fmen%20crewneck.jpg?alt=media&token=1b96b61c-601d-4da0-9ead-afc351c26952"
+                : "https://firebasestorage.googleapis.com/v0/b/shamaim-lifestyle.appspot.com/o/Category%20wallpepar%2Fmen%20crewneck.jpg?alt=media&token=1b96b61c-601d-4da0-9ead-afc351c26952"
+            }
+          />
+          <img
+            src={
+              pattern === "solid"
+                ? "https://firebasestorage.googleapis.com/v0/b/shamaim-lifestyle.appspot.com/o/Category%20wallpepar%2FFmen%20crewneck.jpg?alt=media&token=1b96b61c-601d-4da0-9ead-afc351c26952"
+                : "https://firebasestorage.googleapis.com/v0/b/shamaim-lifestyle.appspot.com/o/Category%20wallpepar%2FFmen%20crewneck.jpg?alt=media&token=1b96b61c-601d-4da0-9ead-afc351c26952"
+            }
+            alt="Mens Crewneck Hoodies"
+            onLoad={() => setBannerLoading(false)}
+            className={`${bannerLoading ? "hidden" : "block"} w-full`}
+          />
+        </picture>
       </div>
 
       {/* Filter sidebar + product grid */}

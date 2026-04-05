@@ -112,7 +112,7 @@ const router = createBrowserRouter([
       { path: "/men/oversized/:pattern", element: <OversizedMen /> },
       { path: "/women/oversized/:pattern", element: <OversizedWomen /> },
       { path: "/men/polo/:pattern", element: <MensPolo /> },
-      { path: "/women/polo/:pattern", element: <WomensPolo /> },
+      { path: "/women/polo/:pattern", element: <ComingSoon /> },
       { path: "/men/hoodies/crewneck/:pattern", element: <MenHoddiesCreackneak /> },
       { path: "/men/hoodies/oversized/:pattern", element: <MenHoddiesDropShoulder /> },
       { path: "/women/hoodies/oversized/:pattern", element: <WomenHoddiesDropShoulder />, },

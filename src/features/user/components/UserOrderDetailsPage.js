@@ -109,7 +109,7 @@ export default function UserOrdersDetailspage() {
                   </p>
 
                   <button
-                    className="px-6 py-3 rounded-xl bg-red-500 text-white
+                    className="hidden px-6 py-3 rounded-xl bg-red-500 text-white
                       font-semibold shadow hover:bg-red-600 transition"
                   >
                     Request Return

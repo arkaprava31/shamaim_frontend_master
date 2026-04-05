@@ -45,17 +45,34 @@ export default function WomenHoddiesDropShoulder() {
   return (
     <>
       {/* Banner — full width, outside FilterWrapper */}
-      <div className="h-full relative">
+      <div className="h-full relative mt-1">
         {bannerLoading && (
-          <div className="w-full h-[200px] md:h-[350px] bg-gray-200 animate-pulse flex items-center justify-center">
-            <p className="text-gray-500 text-sm">Loading banner...</p>
+          <div className="w-full h-[475px] md:h-[350px] bg-gray-100 flex items-center justify-center">
+            <p className="text-gray-400 text-sm animate-pulse">
+              Loading banner...
+            </p>
           </div>
         )}
-        <img
-          src="https://firebasestorage.googleapis.com/v0/b/shamaim-lifestyle.appspot.com/o/Category%20wallpepar%2Fmen%20oversize.jpg?alt=media&token=c2f72afc-b763-4a52-9cda-332c8821416b"
-          onLoad={() => setBannerLoading(false)}
-          className={`${bannerLoading ? "hidden" : "block"} w-full object-cover`}
-        />
+        <picture>
+          <source
+            media="(max-width: 768px)"
+            srcSet={
+              pattern === "solid"
+                ? "https://firebasestorage.googleapis.com/v0/b/shamaim-lifestyle.appspot.com/o/Category%20wallpepar%2Fmen%20oversize.jpg?alt=media&token=c2f72afc-b763-4a52-9cda-332c8821416b"
+                : "https://firebasestorage.googleapis.com/v0/b/shamaim-lifestyle.appspot.com/o/Category%20wallpepar%2Fmen%20oversize.jpg?alt=media&token=c2f72afc-b763-4a52-9cda-332c8821416b"
+            }
+          />
+          <img
+            src={
+              pattern === "solid"
+                ? "https://firebasestorage.googleapis.com/v0/b/shamaim-lifestyle.appspot.com/o/Category%20wallpepar%2Fmen%20oversize.jpg?alt=media&token=c2f72afc-b763-4a52-9cda-332c8821416b"
+                : "https://firebasestorage.googleapis.com/v0/b/shamaim-lifestyle.appspot.com/o/Category%20wallpepar%2Fmen%20oversize.jpg?alt=media&token=c2f72afc-b763-4a52-9cda-332c8821416b"
+            }
+            alt="Womens Drop Shoulder Hoodies"
+            onLoad={() => setBannerLoading(false)}
+            className={`${bannerLoading ? "hidden" : "block"} w-full`}
+          />
+        </picture>
       </div>
 
       {/* Filter sidebar + product grid */}

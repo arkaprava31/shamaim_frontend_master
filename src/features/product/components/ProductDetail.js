@@ -806,7 +806,7 @@ export default function ProductDetail() {
             </div>
           </div>
 
-          <SimilarProducts cat={product.category} subCat={product.subcategory} />
+          <SimilarProducts cat={product.category} subCat={product.subcategory} gender={product.gender} />
         </>
       )}
     </div>

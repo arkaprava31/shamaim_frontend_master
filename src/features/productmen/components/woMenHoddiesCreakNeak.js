@@ -45,17 +45,34 @@ export default function WomenHoddiesCreackneak() {
   return (
     <>
       {/* Banner — full width, outside FilterWrapper */}
-      <div className="h-full relative">
+      <div className="h-full relative mt-1">
         {bannerLoading && (
-          <div className="w-full h-[200px] md:h-[350px] bg-gray-200 animate-pulse flex items-center justify-center">
-            <p className="text-gray-500 text-sm">Loading banner...</p>
+          <div className="w-full h-[475px] md:h-[350px] bg-gray-100 flex items-center justify-center">
+            <p className="text-gray-400 text-sm animate-pulse">
+              Loading banner...
+            </p>
           </div>
         )}
-        <img
-          src="https://firebasestorage.googleapis.com/v0/b/shamaim-lifestyle.appspot.com/o/Category%20wallpepar%2FCLASSIC%20WOMEN.jpg?alt=media&token=1cc64524-9377-4810-89af-fad7a491c7a6"
-          onLoad={() => setBannerLoading(false)}
-          className={`${bannerLoading ? "hidden" : "block"} w-full object-cover`}
-        />
+        <picture>
+          <source
+            media="(max-width: 768px)"
+            srcSet={
+              pattern === "solid"
+                ? "https://firebasestorage.googleapis.com/v0/b/shamaim-lifestyle.appspot.com/o/Category%20wallpepar%2FCLASSIC%20WOMEN.jpg?alt=media&token=1cc64524-9377-4810-89af-fad7a491c7a6"
+                : "https://firebasestorage.googleapis.com/v0/b/shamaim-lifestyle.appspot.com/o/Category%20wallpepar%2FCLASSIC%20WOMEN.jpg?alt=media&token=1cc64524-9377-4810-89af-fad7a491c7a6"
+            }
+          />
+          <img
+            src={
+              pattern === "solid"
+                ? "https://firebasestorage.googleapis.com/v0/b/shamaim-lifestyle.appspot.com/o/Category%20wallpepar%2FCLASSIC%20WOMEN.jpg?alt=media&token=1cc64524-9377-4810-89af-fad7a491c7a6"
+                : "https://firebasestorage.googleapis.com/v0/b/shamaim-lifestyle.appspot.com/o/Category%20wallpepar%2FCLASSIC%20WOMEN.jpg?alt=media&token=1cc64524-9377-4810-89af-fad7a491c7a6"
+            }
+            alt="Womens Crewneck Hoodies"
+            onLoad={() => setBannerLoading(false)}
+            className={`${bannerLoading ? "hidden" : "block"} w-full`}
+          />
+        </picture>
       </div>
 
       {/* Filter sidebar + product grid */}

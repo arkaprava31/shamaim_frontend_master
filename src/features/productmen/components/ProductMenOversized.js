@@ -43,18 +43,34 @@ export default function ProductMenOversized() {
   return (
     <>
       {/* Banner — full width, outside FilterWrapper */}
-      <div className="h-full relative">
+      <div className="h-full relative mt-1">
         {bannerLoading && (
-          <div className="w-full h-[200px] md:h-[350px] bg-gray-200 animate-pulse flex items-center justify-center">
-            <p className="text-gray-500 text-sm">Loading banner...</p>
+          <div className="w-full h-[475px] md:h-[350px] bg-gray-100 flex items-center justify-center">
+            <p className="text-gray-400 text-sm animate-pulse">
+              Loading banner...
+            </p>
           </div>
         )}
-        <img
-          src="https://firebasestorage.googleapis.com/v0/b/shamaim-lifestyle.appspot.com/o/Category%20wallpepar%2FMen%20Oversized.png?alt=media&token=7be0d586-3eac-47b6-84b8-689ef7c88225"
-          alt="Oversized"
-          onLoad={() => setBannerLoading(false)}
-          className={`w-full ${bannerLoading ? "hidden" : "block"}`}
-        />
+        <picture>
+          <source
+            media="(max-width: 768px)"
+            srcSet={
+              pattern === "solid"
+                ? "https://firebasestorage.googleapis.com/v0/b/shamaim-lifestyle.appspot.com/o/Category%20wallpepar%2FMen%20Oversized.png?alt=media&token=7be0d586-3eac-47b6-84b8-689ef7c88225"
+                : "https://firebasestorage.googleapis.com/v0/b/shamaim-lifestyle.appspot.com/o/Category%20wallpepar%2FMen%20Oversized.png?alt=media&token=7be0d586-3eac-47b6-84b8-689ef7c88225"
+            }
+          />
+          <img
+            src={
+              pattern === "solid"
+                ? "https://firebasestorage.googleapis.com/v0/b/shamaim-lifestyle.appspot.com/o/Category%20wallpepar%2FMen%20Oversized.png?alt=media&token=7be0d586-3eac-47b6-84b8-689ef7c88225"
+                : "https://firebasestorage.googleapis.com/v0/b/shamaim-lifestyle.appspot.com/o/Category%20wallpepar%2FMen%20Oversized.png?alt=media&token=7be0d586-3eac-47b6-84b8-689ef7c88225"
+            }
+            alt="Mens Oversized Tees"
+            onLoad={() => setBannerLoading(false)}
+            className={`${bannerLoading ? "hidden" : "block"} w-full`}
+          />
+        </picture>
       </div>
 
       {/* Filter sidebar + product grid */}
@@ -105,9 +121,8 @@ export default function ProductMenOversized() {
                         alt={product.title}
                         loading="lazy"
                         onLoad={() => handleImageLoad(product.id)}
-                        className={`w-full h-52 md:h-64 object-cover group-hover:scale-105 transition duration-300 ${
-                          loadedImages[product.id] ? "opacity-100" : "opacity-0"
-                        }`}
+                        className={`w-full h-52 md:h-64 object-cover group-hover:scale-105 transition duration-300 ${loadedImages[product.id] ? "opacity-100" : "opacity-0"
+                          }`}
                       />
                       {product.discountPercentage > 0 && (
                         <span className="absolute top-3 left-3 bg-red-500 text-white text-xs px-2 py-1 rounded-md">
