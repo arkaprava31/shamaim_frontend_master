@@ -7,12 +7,7 @@ import { useSearchParams } from "react-router-dom";
 const normalizeGenre = (str = "") =>
   str.toLowerCase().replace(/&/g, "and").replace(/\s+/g, "").trim();
 
-const GENRE_MAP = {
-  "music & band":   "musicband",
-  "movies & series":"moviesseries",
-  "super hero":     "superhero",
-  "drip & doodle":  "dripdoodle",
-};
+
 
 function applyClientFilters(docs, filters) {
   let out = [...docs];
@@ -40,8 +35,10 @@ function applyClientFilters(docs, filters) {
   // Genre
   if (filters.genre.length > 0) {
     out = out.filter((p) =>
-      filters.genre.some(
-        (g) => normalizeGenre(p.category) === normalizeGenre(GENRE_MAP[g] || g)
+      filters.genre.some((g) =>
+        p.genre.some(
+          (pg) => normalizeGenre(pg) === normalizeGenre(g)
+        )
       )
     );
   }
@@ -61,7 +58,7 @@ function applyClientFilters(docs, filters) {
   }
 
   // Sort
-  if (filters.sort === "price-asc")  out.sort((a, b) => Number(a.price) - Number(b.price));
+  if (filters.sort === "price-asc") out.sort((a, b) => Number(a.price) - Number(b.price));
   if (filters.sort === "price-desc") out.sort((a, b) => Number(b.price) - Number(a.price));
 
   return out;
@@ -73,23 +70,23 @@ function applyClientFilters(docs, filters) {
 //                        e.g. { subcategories: "Classic Fit", gender: "Male" }
 
 export function useProductFilter(fetchProductFunction, extraParams = {}) {
-  const [allDocs, setAllDocs]   = useState([]);
-  const [error, setError]       = useState(null);
-  const [page, setPage]         = useState(1);
-  const [loading, setLoading]   = useState(false);
-  const [hasMore, setHasMore]   = useState(true);
+  const [allDocs, setAllDocs] = useState([]);
+  const [error, setError] = useState(null);
+  const [page, setPage] = useState(1);
+  const [loading, setLoading] = useState(false);
+  const [hasMore, setHasMore] = useState(true);
 
-  const dispatch      = useDispatch();
-  const loaderRef     = useRef(null);
+  const dispatch = useDispatch();
+  const loaderRef = useRef(null);
   const isFirstRender = useRef(true);
 
   const [searchParams, setSearchParams] = useSearchParams();
 
   const filters = useMemo(() => ({
-    color:      searchParams.get("color")?.split(",").filter(Boolean) || [],
-    size:       searchParams.get("size")?.split(",").filter(Boolean)  || [],
-    genre:      searchParams.get("genre")?.split(",").filter(Boolean) || [],
-    sort:       searchParams.get("sort")       || "",
+    color: searchParams.get("color")?.split(",").filter(Boolean) || [],
+    size: searchParams.get("size")?.split(",").filter(Boolean) || [],
+    genre: searchParams.get("genre")?.split(",").filter(Boolean) || [],
+    sort: searchParams.get("sort") || "",
     priceRange: searchParams.get("priceRange") || "",
   }), [searchParams]);
 
@@ -119,7 +116,7 @@ export function useProductFilter(fetchProductFunction, extraParams = {}) {
         fetchProductFunction({ page: pageNum, ...extraParams })
       ).unwrap();
 
-      const docs       = data?.products?.docs || data?.products || [];
+      const docs = data?.products?.docs || data?.products || [];
       const totalItems = data?.totalItems ?? data?.products?.totalDocs ?? 0;
 
       if (pageNum === 1) {
