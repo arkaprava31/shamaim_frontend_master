@@ -7,8 +7,9 @@ import {
   fetchProductById,
   createProduct,
   updateProduct,
+  fetchProductsByGenre,
   // fetchProductsByGender,
-  
+
 } from './productAPI';
 
 const initialState = {
@@ -72,13 +73,21 @@ export const updateProductAsync = createAsyncThunk(
   }
 );
 
+export const fetchProductsByGenreAsync = createAsyncThunk(
+  'product/fetchProductsByGenre',
+  async ({ page, genre }) => {
+    const response = await fetchProductsByGenre({ page, genre });
+    return response.data;
+  }
+);
+
 
 export const productSlice = createSlice({
   name: 'product',
   initialState,
-  
+
   reducers: {
-    clearSelectedProduct:(state)=>{
+    clearSelectedProduct: (state) => {
       state.selectedProduct = null
     }
   },
@@ -131,6 +140,14 @@ export const productSlice = createSlice({
         state.products[index] = action.payload;
         state.selectedProduct = action.payload;
 
+      })
+      .addCase(fetchProductsByGenreAsync.pending, (state) => {
+        state.status = 'loading';
+      })
+      .addCase(fetchProductsByGenreAsync.fulfilled, (state, action) => {
+        state.status = 'idle';
+        state.products = action.payload.products;
+        state.totalItems = action.payload.totalItems;
       });
   },
 });

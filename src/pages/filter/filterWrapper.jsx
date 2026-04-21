@@ -1,10 +1,10 @@
 import React, { useState } from "react";
 import { FiX, FiFilter, FiChevronDown, FiSliders } from "react-icons/fi";
-import { Drawer, IconButton } from "@material-tailwind/react";
+import { Drawer } from "@material-tailwind/react";
 
-const COLORS = ["black", "yellow", "lavender", "camel", "cream white", "grey"];
-const SIZES = ["xs", "s", "m", "l", "xl", "xxl"];
-const GENRE = ["music & band", "anime", "sports", "movies & series", "super hero", "abstract", "drip & doodle"];
+const COLORS = ["black", "yellow", "lavender", "camel", "cream white", "melange grey"];
+const SIZES = ["XS", "S", "M", "L", "XL", "XXL"];
+const GENRE = ["Bangla O Bangali", "Music & Band", "Anime", "Sports", "Movies & Series", "Superhero", "Abstract", "Drip & Doodle"];
 const SORT_OPTIONS = [
   { label: "Price: Low → High", value: "price-asc" },
   { label: "Price: High → Low", value: "price-desc" },
@@ -27,9 +27,8 @@ function FilterSection({ title, children, defaultOpen = true }) {
         />
       </button>
       <div
-        className={`overflow-hidden transition-all duration-300 ease-in-out ${
-          open ? "max-h-96 opacity-100 pb-4" : "max-h-0 opacity-0"
-        }`}
+        className={`overflow-hidden transition-all duration-300 ease-in-out ${open ? "max-h-96 opacity-100 pb-4" : "max-h-0 opacity-0"
+          }`}
       >
         {children}
       </div>
@@ -44,7 +43,7 @@ const COLOR_MAP = {
   lavender: "#B57BDF",
   camel: "#C19A6B",
   "cream white": "#FFF8F0",
-  grey: "#9E9E9E",
+  "melange grey": "#9E9E9E",
 };
 
 function ColorSwatch({ color, selected, onClick }) {
@@ -52,9 +51,8 @@ function ColorSwatch({ color, selected, onClick }) {
     <button
       onClick={onClick}
       title={color}
-      className={`relative w-8 h-8 rounded-full transition-all duration-200 ${
-        selected ? "ring-2 ring-offset-2 ring-black scale-110" : "hover:scale-105"
-      }`}
+      className={`relative w-8 h-8 rounded-full transition-all duration-200 ${selected ? "ring-2 ring-offset-2 ring-black scale-110" : "hover:scale-105"
+        }`}
       style={{
         backgroundColor: COLOR_MAP[color] || "#ccc",
         border: color === "cream white" ? "1px solid #e5e7eb" : "none",
@@ -89,25 +87,24 @@ function FilterPill({ label, onRemove }) {
   );
 }
 
-// ─── Sidebar Content (shared between desktop + mobile drawer) ─────────────────
-function SidebarContent({ filters, onFilterChange, onClearFilters, onClose }) {
+// ─── Sidebar Content ──────────────────────────────────────────────────────────
+function SidebarContent({ filters, onFilterChange, onClearFilters, onClose, disableGenre }) {
   const hasActiveFilters =
     filters.color?.length || filters.size?.length || filters.genre?.length || filters.sort;
 
   return (
     <div className="h-full flex flex-col">
-      {/* Header */}
       <div className="flex items-center justify-between mb-6 pb-4 border-b border-gray-100">
         <div className="flex items-center gap-2">
           <FiSliders className="w-4 h-4 text-gray-600" />
           <span className="text-sm font-bold tracking-[0.12em] uppercase text-gray-900">
             SHAMAIM
           </span>
-          {hasActiveFilters ? (
+          {hasActiveFilters && (
             <span className="w-5 h-5 bg-black text-white text-[10px] font-bold rounded-full flex items-center justify-center">
               {[filters.color?.length > 0, filters.size?.length > 0, filters.genre?.length > 0, !!filters.sort].filter(Boolean).length}
             </span>
-          ) : null}
+          )}
         </div>
         <div className="flex items-center gap-3">
           {hasActiveFilters && (
@@ -126,42 +123,24 @@ function SidebarContent({ filters, onFilterChange, onClearFilters, onClose }) {
         </div>
       </div>
 
-      {/* Scrollable filter sections */}
       <div className="flex-1 overflow-y-auto space-y-0 pr-1 -mr-1">
 
         {/* Sort */}
         <FilterSection title="Sort By">
           <div className="space-y-2">
             {SORT_OPTIONS.map((opt) => (
-              <label
-                key={opt.value}
-                className="flex items-center gap-3 cursor-pointer group"
-              >
-                <span
-                  className={`w-4 h-4 rounded-full border-2 flex items-center justify-center flex-shrink-0 transition-all duration-150 ${
-                    filters.sort === opt.value
-                      ? "border-black bg-black"
-                      : "border-gray-300 group-hover:border-gray-500"
-                  }`}
-                >
-                  {filters.sort === opt.value && (
-                    <span className="w-1.5 h-1.5 rounded-full bg-white" />
-                  )}
+              <label key={opt.value} className="flex items-center gap-3 cursor-pointer group">
+                <span className={`w-4 h-4 rounded-full border-2 flex items-center justify-center ${filters.sort === opt.value ? "border-black bg-black" : "border-gray-300"
+                  }`}>
+                  {filters.sort === opt.value && <span className="w-1.5 h-1.5 bg-white rounded-full" />}
                 </span>
                 <input
                   type="radio"
-                  name="sort"
                   className="sr-only"
                   checked={filters.sort === opt.value}
                   onChange={() => onFilterChange("sort", opt.value)}
                 />
-                <span
-                  className={`text-sm transition-colors ${
-                    filters.sort === opt.value ? "text-black font-medium" : "text-gray-500 group-hover:text-gray-800"
-                  }`}
-                >
-                  {opt.label}
-                </span>
+                <span className="text-sm">{opt.label}</span>
               </label>
             ))}
           </div>
@@ -184,11 +163,6 @@ function SidebarContent({ filters, onFilterChange, onClearFilters, onClose }) {
               />
             ))}
           </div>
-          {filters.color?.length > 0 && (
-            <p className="mt-3 text-xs text-gray-400 capitalize">
-              {filters.color.join(", ")}
-            </p>
-          )}
         </FilterSection>
 
         {/* Size */}
@@ -205,11 +179,8 @@ function SidebarContent({ filters, onFilterChange, onClearFilters, onClose }) {
                       : [...(filters.size || []), s];
                     onFilterChange("size", updated);
                   }}
-                  className={`w-12 h-10 text-xs font-semibold tracking-wider uppercase border transition-all duration-150 ${
-                    selected
-                      ? "bg-black text-white border-black"
-                      : "bg-white text-gray-500 border-gray-200 hover:border-gray-800 hover:text-gray-800"
-                  }`}
+                  className={`w-12 h-10 text-xs border ${selected ? "bg-black text-white" : "bg-white text-gray-500"
+                    }`}
                 >
                   {s}
                 </button>
@@ -219,43 +190,44 @@ function SidebarContent({ filters, onFilterChange, onClearFilters, onClose }) {
         </FilterSection>
 
         {/* Genre */}
-        <FilterSection title="Genre">
-          <div className="space-y-1">
-            {GENRE.map((g) => {
-              const selected = filters.genre?.includes(g);
-              return (
-                <button
-                  key={g}
-                  onClick={() => {
-                    const updated = selected
-                      ? filters.genre.filter((x) => x !== g)
-                      : [...(filters.genre || []), g];
-                    onFilterChange("genre", updated);
-                  }}
-                  className={`w-full text-left px-3 py-2 text-sm rounded transition-all duration-150 capitalize flex items-center justify-between group ${
-                    selected
-                      ? "bg-black text-white"
-                      : "text-gray-600 hover:bg-gray-50 hover:text-gray-900"
-                  }`}
-                >
-                  <span>{g}</span>
-                  {selected && <FiX className="w-3 h-3 opacity-70" />}
-                </button>
-              );
-            })}
-          </div>
-        </FilterSection>
+        {!disableGenre && (
+          <FilterSection title="Genre">
+            <div className="space-y-1">
+              {GENRE.map((g) => {
+                const selected = filters.genre?.includes(g);
+                return (
+                  <button
+                    key={g}
+                    onClick={() => {
+                      const updated = selected
+                        ? filters.genre.filter((x) => x !== g)
+                        : [...(filters.genre || []), g];
+                      onFilterChange("genre", updated);
+                    }}
+                    className={`w-full text-left px-3 py-2 text-sm ${selected ? "bg-black text-white" : "text-gray-600"
+                      }`}
+                  >
+                    {g}
+                  </button>
+                );
+              })}
+            </div>
+          </FilterSection>
+        )}
       </div>
     </div>
   );
 }
 
-// ─── Main FilterWrapper ───────────────────────────────────────────────────────
-export default function FilterWrapper({ filters = {}, onFilterChange, onClearFilters, children }) {
+// ─── Main Wrapper ─────────────────────────────────────────────────────────────
+export default function FilterWrapper({
+  filters = {},
+  onFilterChange,
+  onClearFilters,
+  children,
+  disableGenre = false,
+}) {
   const [drawerOpen, setDrawerOpen] = useState(false);
-
-  const hasActiveFilters =
-    filters.color?.length || filters.size?.length || filters.genre?.length || filters.sort;
 
   const activeCount = [
     ...(filters.color || []),
@@ -267,138 +239,62 @@ export default function FilterWrapper({ filters = {}, onFilterChange, onClearFil
   return (
     <div className="max-w-7xl mx-auto px-4 py-8">
 
-      {/* ── Mobile top bar ── */}
+      {/* Mobile Filter Button */}
       <div className="md:hidden mb-5">
         <div className="flex items-center justify-between py-3 border-y border-gray-100">
           <button
             onClick={() => setDrawerOpen(true)}
-            className="flex items-center gap-2 text-sm font-semibold tracking-wide text-gray-700 hover:text-black transition-colors"
+            className="flex items-center gap-2 text-sm font-semibold tracking-wide text-gray-700"
           >
             <FiFilter className="w-4 h-4" />
             Filter & Sort
-            {hasActiveFilters && (
-              <span className="ml-1 w-5 h-5 bg-black text-white text-[10px] font-bold rounded-full flex items-center justify-center">
+            {activeCount.length > 0 && (
+              <span className="ml-1 w-5 h-5 bg-black text-white text-[10px] rounded-full flex items-center justify-center">
                 {activeCount.length}
               </span>
             )}
           </button>
 
-          {hasActiveFilters && (
+          {activeCount.length > 0 && (
             <button
               onClick={onClearFilters}
-              className="text-xs text-gray-400 hover:text-black underline underline-offset-2 transition-colors"
+              className="text-xs text-gray-400 hover:text-black underline underline-offset-2"
             >
               Clear all
             </button>
           )}
         </div>
-
-        {/* Active filter pills — mobile */}
-        {hasActiveFilters && (
-          <div className="flex flex-wrap gap-2 pt-3">
-            {filters.color?.map((c) => (
-              <FilterPill
-                key={c}
-                label={c}
-                onRemove={() => onFilterChange("color", filters.color.filter((x) => x !== c))}
-              />
-            ))}
-            {filters.size?.map((s) => (
-              <FilterPill
-                key={s}
-                label={s.toUpperCase()}
-                onRemove={() => onFilterChange("size", filters.size.filter((x) => x !== s))}
-              />
-            ))}
-            {filters.genre?.map((g) => (
-              <FilterPill
-                key={g}
-                label={g}
-                onRemove={() => onFilterChange("genre", filters.genre.filter((x) => x !== g))}
-              />
-            ))}
-            {filters.sort && (
-              <FilterPill
-                label={SORT_OPTIONS.find((o) => o.value === filters.sort)?.label || "Sorted"}
-                onRemove={() => onFilterChange("sort", "")}
-              />
-            )}
-          </div>
-        )}
       </div>
 
-      {/* ── Layout ── */}
       <div className="flex gap-8">
-
-        {/* Desktop sidebar */}
-        <aside className="hidden md:block w-64 shrink-0">
-          <div className="sticky top-24 bg-white border border-gray-100 rounded-lg p-5 shadow-sm">
-            <SidebarContent
-              filters={filters}
-              onFilterChange={onFilterChange}
-              onClearFilters={onClearFilters}
-            />
-          </div>
+        {/* Desktop Sidebar */}
+        <aside className="hidden md:block w-64">
+          <SidebarContent
+            filters={filters}
+            onFilterChange={onFilterChange}
+            onClearFilters={onClearFilters}
+            disableGenre={disableGenre}
+          />
         </aside>
 
-        {/* Main content */}
-        <main className="flex-1 min-w-0">
-          {/* Active filter pills — desktop */}
-          {hasActiveFilters && (
-            <div className="hidden md:flex flex-wrap items-center gap-2 mb-6 pb-4 border-b border-gray-100">
-              <span className="text-xs font-bold tracking-widest uppercase text-gray-400 mr-1">
-                Active:
-              </span>
-              {filters.color?.map((c) => (
-                <FilterPill
-                  key={c}
-                  label={c}
-                  onRemove={() => onFilterChange("color", filters.color.filter((x) => x !== c))}
-                />
-              ))}
-              {filters.size?.map((s) => (
-                <FilterPill
-                  key={s}
-                  label={s.toUpperCase()}
-                  onRemove={() => onFilterChange("size", filters.size.filter((x) => x !== s))}
-                />
-              ))}
-              {filters.genre?.map((g) => (
-                <FilterPill
-                  key={g}
-                  label={g}
-                  onRemove={() => onFilterChange("genre", filters.genre.filter((x) => x !== g))}
-                />
-              ))}
-              {filters.sort && (
-                <FilterPill
-                  label={SORT_OPTIONS.find((o) => o.value === filters.sort)?.label || "Sorted"}
-                  onRemove={() => onFilterChange("sort", "")}
-                />
-              )}
-            </div>
-          )}
-
-          {children}
-        </main>
+        {/* Main Content */}
+        <main className="flex-1">{children}</main>
       </div>
 
-      {/* Mobile drawer */}
+      {/* Mobile Drawer */}
       <Drawer
         open={drawerOpen}
         onClose={() => setDrawerOpen(false)}
-        placement="left"
-        size={300}
-        className="p-5"
-        overlay
+        placement="left" size={300} className="p-5" overlay
       >
         <SidebarContent
           filters={filters}
           onFilterChange={onFilterChange}
-          onClearFilters={() => { onClearFilters(); setDrawerOpen(false); }}
+          onClearFilters={onClearFilters}
+          disableGenre={disableGenre}
           onClose={() => setDrawerOpen(false)}
         />
       </Drawer>
     </div>
   );
-}
+} 

@@ -64,6 +64,19 @@ export function fetchBrands() {
   });
 }
 
+export function fetchProductsByGenre({ page, genre }) {
+  return new Promise(async (resolve) => {
+    const response = await fetch(
+      `${baseUrl}/products?genre=${encodeURIComponent(genre)}&pages=${page}`
+    );
+
+    const data = await response.json();
+    const totalItems = await response.headers.get('X-Total-Count');
+
+    resolve({ data: { products: data, totalItems: +totalItems } });
+  });
+}
+
 
 
 

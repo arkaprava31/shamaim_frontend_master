@@ -29,6 +29,7 @@ import {
 } from "@material-tailwind/react";
 import { FacebookIcon, FacebookShareButton, TelegramIcon, TelegramShareButton, WhatsappIcon, WhatsappShareButton } from "react-share";
 import SimilarProducts from "./SimilarProducts";
+import SharePdtDialog from "../../common/SharePdtDialog";
 
 function classNames(...classes) {
   return classes.filter(Boolean).join(" ");
@@ -632,14 +633,15 @@ export default function ProductDetail() {
                 </div> */}
 
                   <Dialog open={open} handler={handleOpen} size="lg" className="w-full flex flex-col items-center justify-start gap-1 p-4 text-black tracking-wider">
-                    <div className="w-full text-left text-lg font-semibold">
-                      Size Guide ({currentSizeChart?.type} {currentSizeChart?.category} - {currentSizeChart?.gender})
+                    <div className="w-full text-left text-lg font-semibold flex flex-col justify-start">
+                      <p>Size Guide </p>
+                      <p className="text-base font-normal">({currentSizeChart?.type} {currentSizeChart?.category} - {currentSizeChart?.gender})</p>
                     </div>
                     <div className="w-full flex items-center justify-end">
                       <div className="text-white bg-black px-3 py-0.5 rounded-md">inch</div>
                     </div>
                     <div className="w-full flex flex-col md:flex-row items-center justify-center gap-4 mt-2">
-                      <div className="w-[80%] md:w-[40%] flex items-center justify-center">
+                      <div className="w-[80%] md:w-[40%] hidden md:flex items-center justify-center">
                         <img className="w-full" src="./../../guide.jpg" />
                       </div>
                       <div className="w-full md:w-[60%] flex items-center justify-start">
@@ -685,20 +687,7 @@ export default function ProductDetail() {
                 </button>
               </div>
 
-              <Dialog open={openShare} handler={handleOpenShare} size="md" className="p-4 bg-white w-full flex flex-col items-center justify-center gap-4">
-                <div className="w-full flex items-center justify-center gap-2">
-                  <FacebookShareButton url={window.location.href}>
-                    <FacebookIcon size={44} round={true} />
-                  </FacebookShareButton>
-                  <WhatsappShareButton url={window.location.href}>
-                    <WhatsappIcon size={44} round={true} />
-                  </WhatsappShareButton>
-                  <TelegramShareButton url={window.location.href}>
-                    <TelegramIcon size={44} round={true} />
-                  </TelegramShareButton>
-                </div>
-                <div className="border border-solid border-gray-600 py-1.5 px-2 bg-gray-100 text-black rounded-md">{window.location.href}</div>
-              </Dialog>
+              <SharePdtDialog openShare={openShare} handleOpenShare={handleOpenShare} />
 
               <div className="py-10 lg:col-span-2 lg:col-start-1 lg:border-r lg:border-gray-200 lg:pb-16 lg:pr-8 lg:pt-6">
                 {/* Description and details */}
@@ -806,7 +795,7 @@ export default function ProductDetail() {
             </div>
           </div>
 
-          <SimilarProducts cat={product.category} subCat={product.subcategory} gender={product.gender} />
+          <SimilarProducts cat={product.category} subCat={product.subcategory} gender={product.gender} id={product.id} />
         </>
       )}
     </div>

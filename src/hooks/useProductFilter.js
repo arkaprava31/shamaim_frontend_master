@@ -34,13 +34,17 @@ function applyClientFilters(docs, filters) {
 
   // Genre
   if (filters.genre.length > 0) {
-    out = out.filter((p) =>
-      filters.genre.some((g) =>
-        p.genre.some(
+    out = out.filter((p) => {
+      if (!p.genre) return false;
+
+      const pGenres = Array.isArray(p.genre) ? p.genre : [p.genre];
+
+      return filters.genre.some((g) =>
+        pGenres.some(
           (pg) => normalizeGenre(pg) === normalizeGenre(g)
         )
-      )
-    );
+      );
+    });
   }
 
   // Price range

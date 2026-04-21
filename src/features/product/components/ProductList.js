@@ -1,69 +1,19 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState } from "react";
 import { fetchProductsByFiltersAsync } from "../productSlice";
-import { useDispatch } from "react-redux";
 import { Link } from "react-router-dom";
+import { useProductFilter } from "../../../hooks/useProductFilter";
 
 export default function ProductList() {
-  const [products, setProducts] = useState([]);
   const [loadedImages, setLoadedImages] = useState({});
-  const [page, setPage] = useState(1);
-  const [loading, setLoading] = useState(false);
-  const [initialLoading, setInitialLoading] = useState(true);
-  const [hasMore, setHasMore] = useState(true);
-  const [error, setError] = useState(null);
-  
 
-  const dispatch = useDispatch();
-  const loader = useRef(null);
+  const {
+    products,
+    loading,
+    hasMore,
+    loaderRef,
+  } = useProductFilter(fetchProductsByFiltersAsync);
 
-  useEffect(() => {
-    window.scrollTo(0, 0);
-  }, []);
-
-  const fetchProducts = async () => {
-    if (loading || !hasMore) return;
-
-    setLoading(true);
-
-    try {
-      const data = await dispatch(
-        fetchProductsByFiltersAsync({ page })
-      ).unwrap();
-
-      const newProducts = data?.products?.docs || [];
-
-      if (newProducts.length === 0) {
-        setHasMore(false);
-      }
-
-      setProducts((prev) => [...prev, ...newProducts]);
-    } catch (err) {
-      setError("Error while fetching the data");
-      console.error(err);
-    }
-
-    setLoading(false);
-    setInitialLoading(false);
-  };
-
-  useEffect(() => {
-    fetchProducts();
-  }, [page]);
-
-  useEffect(() => {
-    const observer = new IntersectionObserver(
-      (entries) => {
-        if (entries[0].isIntersecting && !loading && hasMore) {
-          setPage((prev) => prev + 1);
-        }
-      },
-      { rootMargin: "200px" }
-    );
-
-    if (loader.current) observer.observe(loader.current);
-
-    return () => observer.disconnect();
-  }, [loading, hasMore]);
+  const initialLoading = loading && products.length === 0;
 
   const handleImageLoad = (id) => {
     setLoadedImages((prev) => ({ ...prev, [id]: true }));
@@ -75,12 +25,11 @@ export default function ProductList() {
         Shamaim
       </p>
 
-      {error && <p className="text-center text-red-500">{error}</p>}
-
       {(initialLoading || products.length !== 0) && (
         <div className="w-full flex justify-center">
           <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-5 md:gap-8 p-4 w-full md:w-[80%] font-poppins">
 
+            {/* Initial Skeleton */}
             {initialLoading &&
               [...Array(8)].map((_, i) => (
                 <div
@@ -88,7 +37,6 @@ export default function ProductList() {
                   className="bg-white rounded-2xl border border-gray-100 overflow-hidden"
                 >
                   <div className="w-full h-52 md:h-64 bg-gray-200 animate-pulse"></div>
-
                   <div className="p-3 space-y-2">
                     <div className="h-3 bg-gray-200 rounded animate-pulse w-16"></div>
                     <div className="h-4 bg-gray-200 rounded animate-pulse w-full"></div>
@@ -97,6 +45,7 @@ export default function ProductList() {
                 </div>
               ))}
 
+            {/* Products */}
             {products.map((product) => {
               const discountedPrice = Math.floor(
                 product.price -
@@ -111,7 +60,6 @@ export default function ProductList() {
                   hover:shadow-xl hover:-translate-y-1 transition-all duration-300"
                 >
                   <div className="relative overflow-hidden">
-
                     {!loadedImages[product.id] && (
                       <div className="absolute inset-0 bg-gray-200 animate-pulse"></div>
                     )}
@@ -160,14 +108,14 @@ export default function ProductList() {
               );
             })}
 
-            {loading &&
+            {/* Infinite Scroll Skeleton */}
+            {loading && !initialLoading &&
               [...Array(4)].map((_, i) => (
                 <div
                   key={"loading" + i}
                   className="bg-white rounded-2xl border border-gray-100 overflow-hidden"
                 >
                   <div className="w-full h-52 md:h-64 bg-gray-200 animate-pulse"></div>
-
                   <div className="p-3 space-y-2">
                     <div className="h-3 bg-gray-200 rounded animate-pulse w-16"></div>
                     <div className="h-4 bg-gray-200 rounded animate-pulse w-full"></div>
@@ -179,13 +127,15 @@ export default function ProductList() {
         </div>
       )}
 
-      {!initialLoading && products.length === 0 && (
+      {/* Empty State */}
+      {!loading && products.length === 0 && (
         <div className="text-center text-gray-700 text-sm py-8">
           No products found.
         </div>
       )}
 
-      <div ref={loader} className=""></div>
+      {/* Infinite Scroll Trigger */}
+      <div ref={loaderRef}></div>
     </>
   );
 }

@@ -1,11 +1,11 @@
-import { useMemo } from "react";
+import { useEffect, useMemo } from "react";
 import { fetchProductsByFiltersAsync } from "../productSlice";
 import { Link } from "react-router-dom";
 import { useProductFilter } from "../../../hooks/useProductFilter";
 import FilterWrapper from "../../../pages/filter/filterWrapper";
 import { MEN_FILTER_CONFIG, WOMEN_FILTER_CONFIG } from "../../../config/filterConfig";
 
-const SimilarProducts = ({ cat, subCat, gender }) => {
+const SimilarProducts = ({ cat, subCat, gender, id }) => {
   const {
     products: allProducts,
     loading,
@@ -20,9 +20,9 @@ const SimilarProducts = ({ cat, subCat, gender }) => {
 
   const products = useMemo(() => {
     return allProducts.filter(
-      (p) => p.category === cat && p.subcategory === subCat && p.gender === gender
+      (p) => p.category === cat && p.gender === gender && p.id != id
     );
-  }, [allProducts, cat, subCat]);
+  }, [allProducts, cat, gender, id]);
 
   return (
     <>
